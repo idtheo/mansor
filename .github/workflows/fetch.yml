@@ -1,27 +1,36 @@
 name: Fetch API to JSON
 
+permissions:
+  contents: write  # اجازه نوشتن روی ریپو برای GITHUB_TOKEN
+
 on:
   schedule:
-    - cron: '*/5 * * * *'  # هر 5 دقیقه
-  workflow_dispatch: {}     # امکان اجرای دستی از تب Actions
+    - cron: '*/5 * * * *'   # هر 5 دقیقه یک‌بار
+  workflow_dispatch: {}      # اجرای دستی از تب Actions
+  push:
+    paths:
+      - ".github/workflows/fetch.yml"  # برای تست، با هر تغییر این فایل اجرا می‌شود
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Fetch API Data
+      - name: Fetch API Data (JSON)
         uses: JamesIves/fetch-api-data-action@v2
         with:
           endpoint: https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G
           configuration: '{ "method": "GET" }'
 
-      - name: Move JSON to root
+      - name: Move JSON to repository root
         run: |
-          mkdir -p .
-          mv fetch-api-data-action/data.json data.json
+          if [ -f "fetch-api-data-action/data.json" ]; then
+            mv fetch-api-data-action/data.json data.json
+          else
+            echo '{}' > data.json
+          fi
 
       - name: Commit changes if updated
         uses: test-room-7/action-update-file@v1
