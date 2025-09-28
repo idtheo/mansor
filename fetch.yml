@@ -1,0 +1,31 @@
+name: Fetch API to JSON
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # هر 5 دقیقه
+  workflow_dispatch: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch API Data
+        uses: JamesIves/fetch-api-data-action@releases/v1
+        with:
+          ENDPOINT: https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G
+          SAVE_NAME: data
+          # به‌صورت پیش‌فرض به پوشه fetch-api-data-action می‌ریزد
+
+      - name: Move JSON to root
+        run: |
+          mv fetch-api-data-action/data.json data.json
+
+      - name: Commit changes
+        uses: test-room-7/action-update-file@v1
+        with:
+          file-path: data.json
+          commit-msg: "chore: update data.json from API"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
