@@ -1,22 +1,32 @@
-      - name: Test API with curl (debug)
+name: Fetch API to JSON
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+  push:
+    paths:
+      - ".github/workflows/fetch.yml"
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch JSON via curl
         run: |
           set -e
-          curl -sS -o api.json -w "HTTP:%{http_code}\n" "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G"
-          echo "api.json size: $(stat -c%s api.json) bytes"
-          head -c 300 api.json || true
+          curl -sS "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G" -o data.json
+          test -s data.json || { echo "Empty data.json"; exit 1; }
 
-      - name: Fetch API Data (action)
-        id: fetch
-        uses: JamesIves/fetch-api-data-action@v2
+      - name: Commit if changed
+        uses: test-room-7/action-update-file@v1
         with:
-          endpoint: "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G"
-          configuration: '{ "method": "GET" }'
-
-      - name: Inspect action output
-        run: |
-          ls -la fetch-api-data-action || true
-          if [ -s "fetch-api-data-action/data.json" ]; then
-            head -c 300 fetch-api-data-action/data.json
-          else
-            echo "ACTION MISSING OUTPUT" >&2; exit 1
-          fi
+          file-path: data.json
+          commit-msg: "chore: update data.json from API"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
