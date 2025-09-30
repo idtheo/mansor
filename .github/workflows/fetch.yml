@@ -22,7 +22,7 @@ jobs:
         id: fetch
         uses: JamesIves/fetch-api-data-action@v2
         with:
-          endpoint: https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G
+          endpoint: "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G"
           configuration: '{ "method": "GET" }'
 
       - name: Inspect output (debug)
@@ -30,6 +30,7 @@ jobs:
           echo "Fetch env length: ${#FETCH_API_DATA}" || true
           ls -la
           ls -la fetch-api-data-action || true
+          test -s fetch-api-data-action/data.json
 
       - name: Move JSON to repository root
         run: |
