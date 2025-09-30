@@ -27,19 +27,19 @@ jobs:
 
       - name: Inspect output (debug)
         run: |
-          echo "Fetch env length: ${#FETCH_API_DATA}" || true
+          echo "Fetch env length: ${#FETCH_API_DATA}"
           ls -la
           ls -la fetch-api-data-action || true
-          test -s fetch-api-data-action/data.json
+          cat fetch-api-data-action/data.json 2>/dev/null | head -c 300 || true
+
+      - name: Ensure JSON exists
+        run: |
+          if [ ! -s "fetch-api-data-action/data.json" ]; then
+            echo "ERROR: data.json not created by fetch-api-data-action (empty or missing)"; exit 1;
+          fi
 
       - name: Move JSON to repository root
-        run: |
-          if [ -f "fetch-api-data-action/data.json" ]; then
-            mv fetch-api-data-action/data.json data.json
-          else
-            echo "Fetch failed or no data.json created" >&2
-            exit 1
-          fi
+        run: mv -f fetch-api-data-action/data.json data.json
 
       - name: Commit changes if updated
         uses: test-room-7/action-update-file@v1
