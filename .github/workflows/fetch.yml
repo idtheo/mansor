@@ -1,49 +1,22 @@
-name: Fetch API to JSON
+      - name: Test API with curl (debug)
+        run: |
+          set -e
+          curl -sS -o api.json -w "HTTP:%{http_code}\n" "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G"
+          echo "api.json size: $(stat -c%s api.json) bytes"
+          head -c 300 api.json || true
 
-permissions:
-  contents: write
-
-on:
-  schedule:
-    - cron: "*/5 * * * *"
-  workflow_dispatch: {}
-  push:
-    paths:
-      - ".github/workflows/fetch.yml"
-
-jobs:
-  refresh:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Fetch API Data (JSON)
+      - name: Fetch API Data (action)
         id: fetch
         uses: JamesIves/fetch-api-data-action@v2
         with:
           endpoint: "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G"
           configuration: '{ "method": "GET" }'
 
-      - name: Inspect output (debug)
+      - name: Inspect action output
         run: |
-          echo "Fetch env length: ${#FETCH_API_DATA}"
-          ls -la
           ls -la fetch-api-data-action || true
-          cat fetch-api-data-action/data.json 2>/dev/null | head -c 300 || true
-
-      - name: Ensure JSON exists
-        run: |
-          if [ ! -s "fetch-api-data-action/data.json" ]; then
-            echo "ERROR: data.json not created by fetch-api-data-action (empty or missing)"; exit 1;
+          if [ -s "fetch-api-data-action/data.json" ]; then
+            head -c 300 fetch-api-data-action/data.json
+          else
+            echo "ACTION MISSING OUTPUT" >&2; exit 1
           fi
-
-      - name: Move JSON to repository root
-        run: mv -f fetch-api-data-action/data.json data.json
-
-      - name: Commit changes if updated
-        uses: test-room-7/action-update-file@v1
-        with:
-          file-path: data.json
-          commit-msg: "chore: update data.json from API"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
