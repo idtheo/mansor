@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ir">
   <head>
     <meta charset="UTF-8"/>
     <title>Visitor anti-robot validation</title>
@@ -10,330 +10,1008 @@
 <meta name="generator" content="Joomla! 1.5 - Open Source Content Management" />
 <meta name="generator" content="WordPress 2.5" />
     <style>
-      html,
-      body,
-      div,
-      span,
-      applet,
-      object,
-      iframe,
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6,
-      p,
-      blockquote,
-      pre,
-      a,
-      abbr,
-      acronym,
-      address,
-      big,
-      cite,
-      code,
-      del,
-      dfn,
-      em,
-      img,
-      ins,
-      kbd,
-      q,
-      s,
-      samp,
-      small,
-      strike,
-      strong,
-      sub,
-      sup,
-      tt,
-      var,
-      b,
-      u,
-      i,
-      center,
-      dl,
-      dt,
-      dd,
-      ol,
-      ul,
-      li,
-      fieldset,
-      form,
-      label,
-      legend,
-      table,
-      caption,
-      tbody,
-      tfoot,
-      thead,
-      tr,
-      th,
-      td,
-      article,
-      aside,
-      canvas,
-      details,
-      embed,
-      figure,
-      figcaption,
-      footer,
-      header,
-      hgroup,
-      menu,
-      nav,
-      output,
-      ruby,
-      section,
-      summary,
-      time,
-      mark,
-      audio,
-      video {
-        margin: 0;
-        padding: 0;
-        border: 0;
-        font-size: 100%;
-        font: inherit;
-        vertical-align: baseline;
-      }
+    /* Inline layout/styles (Tailwind-compatible look, no CDN / no runtime Tailwind JS) */
+    .bn403-page {
+      margin: 0;
+      box-sizing: border-box;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 0.75rem;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+        sans-serif;
+      background: #e8ecf4;
+      color: #111827;
+    }
+    html.dark .bn403-page {
+      background: #181f2c;
+      color: #e5e7eb;
+    }
+    *,
+    *::before,
+    *::after {
+      box-sizing: inherit;
+    }
 
-      b {
-        font-weight: bold;
-      }
+    .bn403-theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 50;
+      padding: 0.75rem;
+      border-radius: 9999px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15),
+        0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      background: #e5e7eb;
+      color: #1f2937;
+      border: 1px solid #d1d5db;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    html.dark .bn403-theme-toggle {
+      background: #232b3e;
+      color: #e5e7eb;
+      border-color: #2e3a54;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    .bn403-theme-toggle:hover {
+      transform: scale(1.1);
+    }
+    .bn403-theme-toggle:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6;
+    }
+    html.dark .bn403-theme-toggle:focus {
+      box-shadow: 0 0 0 2px #181f2c, 0 0 0 4px #3b82f6;
+    }
 
-      /* HTML5 display-role reset for older browsers */
-      article,
-      aside,
-      details,
-      figcaption,
-      figure,
-      footer,
-      header,
-      hgroup,
-      menu,
-      nav,
-      section {
-        display: block;
+    .bn403-main {
+      width: 100%;
+      max-width: min(100rem, calc(100vw - 1.5rem));
+      margin-left: auto;
+      margin-right: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+    @media (min-width: 768px) {
+      .bn403-main {
+        padding: 2rem 2.25rem;
+        flex-direction: row;
+        align-items: stretch;
+        min-height: min(88vh, 920px);
       }
+    }
+    @media (min-width: 1200px) {
+      .bn403-main {
+        padding: 2.5rem 3rem;
+        max-width: min(112rem, calc(100vw - 3rem));
+      }
+    }
 
-      body {
-        line-height: 1;
+    .bn403-panel-left {
+      flex: 1 1 0%;
+      background: #fdfefe;
+      border-radius: 1rem 1rem 0 0;
+      border: 1px solid #dbe0ea;
+      border-right: none;
+      box-shadow: 0 12px 28px rgba(22, 32, 58, 0.08),
+        0 4px 10px rgba(22, 32, 58, 0.04);
+      padding: 1.75rem 1.375rem;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      min-width: 0;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    .bn403-panel-left::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: inherit;
+      opacity: 0.85;
+      background:
+        radial-gradient(
+          ellipse 120% 80% at 50% -15%,
+          rgba(232, 69, 69, 0.11),
+          transparent 52%
+        ),
+        radial-gradient(
+          circle at 100% 100%,
+          rgba(59, 130, 246, 0.07),
+          transparent 45%
+        );
+    }
+    html.dark .bn403-panel-left::before {
+      opacity: 0.55;
+      background:
+        radial-gradient(
+          ellipse 120% 85% at 50% -20%,
+          rgba(232, 69, 69, 0.18),
+          transparent 50%
+        ),
+        radial-gradient(
+          circle at 100% 100%,
+          rgba(96, 165, 250, 0.1),
+          transparent 42%
+        );
+    }
+    .bn403-panel-left > * {
+      position: relative;
+      z-index: 1;
+    }
+    html.dark .bn403-panel-left {
+      background: #232b3e;
+      border: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    }
+    @media (min-width: 768px) {
+      .bn403-panel-left {
+        border-radius: 1rem 0 0 1rem;
+        flex: 1.12 1 0;
+        min-width: 0;
+        padding: 2.5rem 2.75rem;
       }
+      .bn403-panel-right {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+    }
 
-      ol,
-      ul {
-        list-style: none;
+    .bn403-panel-brand {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem 1.25rem;
+      width: 100%;
+      margin: 0 0 1.75rem;
+    }
+    [dir="rtl"] .bn403-panel-brand {
+      justify-content: flex-start;
+    }
+    .bn403-panel-brand-slot {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+    .bn403-logo-wrap {
+      flex: 0 1 auto;
+      min-width: 0;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .bn403-logo {
+      height: 3rem;
+      width: auto;
+      animation: popIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    /* Logo SVG is authored for dark UI: white letterforms + plate. Retheme for light. */
+    .bn403-logo > path[fill="white"] {
+      fill: #141b2d;
+    }
+    html.dark .bn403-logo > path[fill="white"] {
+      fill: #ffffff;
+    }
+    .bn403-logo-mascot-bg {
+      fill: #d9dee8;
+    }
+    html.dark .bn403-logo-mascot-bg {
+      fill: #ffffff;
+    }
+    @media (min-width: 768px) {
+      .bn403-logo {
+        height: 4rem;
       }
+    }
 
-      blockquote,
-      q {
-        quotes: none;
+    .bn403-copy {
+      max-width: min(48rem, 100%);
+      width: 100%;
+      margin-inline: auto;
+    }
+    .bn403-title {
+      font-size: 1.875rem;
+      line-height: 2.25rem;
+      font-weight: 700;
+      text-align: start;
+      color: #e84545;
+      margin: 0 0 1rem;
+    }
+    @media (min-width: 768px) {
+      .bn403-title {
+        font-size: 1.5rem;
+        line-height: 2rem;
       }
+    }
+    .bn403-lead {
+      font-size: 0.875rem;
+      line-height: 1.55;
+      text-align: start;
+      color: #1f2937;
+      margin: 0 0 1.75rem;
+    }
+    html.dark .bn403-lead {
+      color: #e5e7eb;
+    }
+    @media (min-width: 768px) {
+      .bn403-lead {
+        font-size: 1rem;
+      }
+    }
 
-      blockquote:before,
-      blockquote:after,
-      q:before,
-      q:after {
-        content: none;
-      }
+    .bn403-ip-card {
+      width: 100%;
+      max-width: min(48rem, 100%);
+      margin-inline: auto;
+      border-radius: 0.75rem;
+      border: 1px dashed #22c55e;
+      padding: 1rem;
+      margin-bottom: clamp(3rem, 10vw, 6rem);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      justify-items: center;
+      min-width: 0;
+      animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+      animation-delay: 0.2s;
+      background: rgba(34, 197, 94, 0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .bn403-ip-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 32px rgba(34, 197, 94, 0.12),
+        0 4px 12px rgba(22, 32, 58, 0.06);
+    }
+    html.dark .bn403-ip-card {
+      background: #27324a;
+      border-color: #22c55e;
+    }
+    .bn403-ip-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .bn403-ip-label {
+      font-size: 1rem;
+      line-height: 1.5;
+      font-weight: 900;
+      color: #4b5563;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    html.dark .bn403-ip-label {
+      color: #d1d5db;
+    }
+    .bn403-ip-value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: clamp(0.75rem, 0.35vw + 0.68rem, 1.125rem);
+      line-height: 1.45;
+      color: #1f2937;
+      max-width: 100%;
+      width: 100%;
+      text-align: center;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      padding: 0 0.25rem;
+    }
+    html.dark .bn403-ip-value {
+      color: #f3f4f6;
+    }
 
-      table {
-        border-collapse: collapse;
-        border-spacing: 0;
-      }
-
-      html,
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Calibri", Roboto,
-          Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-        line-height: 150%;
-      }
-
-      .page-container {
-        background-color: transparent;
-        max-width: 460px;
-        margin: auto;
-      }
-      .page-container .contact-support {
-        color: #979797;
-        font-size: 12px;
-        padding: 10px 20px;
-        display: flex;
-        flex-direction: column;
-        text-align: center;
-      }
-      .page-container .contact-support > div {
-        flex: 1 0;
-      }
-      @media screen and (min-width: 460px) {
-        .page-container .contact-support {
-          flex-direction: row;
-          padding: 15px 40px;
-        }
-      }
-      .page-container .card {
-        padding: 28px;
-        margin: 0 auto 30px auto;
-        background: #ffffff;
-        font-size: 14px;
-      }
-      @media screen and (min-width: 460px) {
-        .page-container .card {
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-          border-radius: 10px;
-          font-size: 18px;
-        }
-      }
-      .page-container .card.alert {
-        border: 2px solid #c40000;
-      }
-      .page-container .card.alert .title {
-        font-weight: bold;
-      }
-      .page-container .card.alert p {
-        padding: 10px 0;
-      }
-      .page-container .captcha-container {
-        margin-top: -20px;
-      }
-      @media screen and (min-width: 460px) {
-        .page-container .captcha-container {
-          padding: 10px 10px;
-        }
-      }
-      .page-container .captcha-container .logo {
-        display: block;
-        max-height: 77px;
-        margin: auto;
-        padding-top: 20px;
-      }
-
-      .page-container .captcha-container .container-header {
-        display: flex;
+    @media (min-width: 640px) {
+      .bn403-ip-stack {
+        flex-direction: row;
         align-items: center;
-      }
-
-      .page-container .captcha-container .title {
-        font-size: 24px;
-        padding: 30px 0 15px 0;
-        font-weight: bold;
-      }
-      .page-container .captcha-container .captcha {
-        padding: 30px 0;
-        text-align: center;
-      }
-      .page-container .captcha-container .captcha .g-recaptcha {
-        display: inline-block;
-      }
-      .page-container .captcha-container .domain {
-        font-weight: bold;
-      }
-      .page-container .captcha-container .description {
-        padding: 20px 0;
-      }
-      .page-container .captcha-container .ip-info {
-        font-size: 12px;
-        line-height: 14px;
-        color: #979797;
-      }
-      .page-container .captcha-container .ip-info b {
-        color: #c40000;
-        font-weight: bold;
-      }
-      .page-container .captcha-container #moreInfoDropdown {
-        font-size: 14px;
-        text-align: center;
-        color: #c40000;
-        cursor: pointer;
-      }
-      .page-container .captcha-container #moreInfo {
-        font-size: 14px;
-        color: #979797;
-        padding-top: 20px;
-        display: none;
-        text-align: center;
-        line-height: 150%;
-      }
-
-      #languageDropdown {
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        margin-top: -20px;
-        text-align-last: right;
-        text-align: right;
-      }
-
-      .delist-button {
-        font-family: "Roboto", sans-serif;
-        font-size: 14px;
-        background-color: #c40000;
-        color: white;
-        padding: 8px 20px;
-        border-radius: 5px;
-        text-transform: uppercase;
-        outline: none;
-        border: none;
-        cursor: pointer;
-        font-weight: 400;
-        letter-spacing: 1px;
-      }
-      @media screen and (min-width: 460px) {
-        .delist-button {
-          padding: 18px 40px;
-          font-size: 18px;
-        }
-      }
-
-      select:focus {
-        outline: none;
-      }
-
-      footer {
-        color: #979797;
-        font-size: 12px;
-        text-align: center;
-        width: 100%;
-      }
-
-      .center {
-        text-align: center;
-      }
-
-      .right {
-        text-align: right;
-      }
-
-      .visible {
-        display: block !important;
-      }
-
-      .invisible {
-        display: none !important;
-      }
-
-      input {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-      }
-
-      .form-actions {
-        display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-top: 30px;
+        gap: 1rem 1.5rem;
       }
+      .bn403-ip-value {
+        text-align: end;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+    }
 
-      .flex-center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
+    .bn403-steps-sheet {
+      width: 100%;
+      max-width: min(48rem, 100%);
+      margin-inline: auto;
+      margin-top: clamp(0.5rem, 2vw, 1.25rem);
+      margin-bottom: 1.25rem;
+      border-radius: 0.875rem;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 4px 22px rgba(22, 32, 58, 0.07);
+      animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+      animation-delay: 0.28s;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    html.dark .bn403-steps-sheet {
+      border-color: rgba(71, 85, 105, 0.5);
+      background: rgba(26, 35, 52, 0.65);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32);
+    }
+    .bn403-steps-sheet:hover {
+      border-color: rgba(148, 163, 184, 0.58);
+      box-shadow: 0 12px 36px rgba(22, 32, 58, 0.1);
+    }
+    html.dark .bn403-steps-sheet:hover {
+      border-color: rgba(100, 116, 139, 0.48);
+    }
+    .bn403-continue-sheet {
+      padding: 1.25rem 1.375rem 1.35rem;
+      text-align: center;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+    .bn403-continue-note {
+      margin: 0;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.45;
+      color: #475569;
+    }
+    html.dark .bn403-continue-note {
+      color: #cbd5e1;
+    }
+    .bn403-continue-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      width: 100%;
+      min-height: 3rem;
+      padding: 0.75rem 1.125rem;
+      margin: 0;
+      border: 1px solid rgba(21, 128, 61, 0.35);
+      border-radius: 0.625rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.35;
+      text-decoration: none;
+      color: #ffffff;
+      background: #28A377;
+      transition: transform 0.18s ease, box-shadow 0.18s ease,
+        filter 0.18s ease, border-color 0.18s ease;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      text-align: center;
+    }
+    .bn403-continue-btn-label {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0.15rem 0.35rem;
+      max-width: 100%;
+      font-size: 1.0625rem;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+    .bn403-continue-btn-prefix {
+      font-weight: inherit;
+      font-family: inherit;
+    }
+    .bn403-continue-host {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      text-align: center;
+      font-weight: 800;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 0.98em;
+      letter-spacing: 0.02em;
+    }
+    .bn403-continue-btn .bn403-continue-host::before {
+      content: "›";
+      display: inline-block;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+        Arial, sans-serif;
+      font-weight: 700;
+      font-size: 0.92em;
+      margin-inline-end: 0.4rem;
+      opacity: 0.92;
+      transform: translateY(-0.04em);
+    }
+    [dir="rtl"] .bn403-continue-btn .bn403-continue-host::before {
+      content: "‹";
+      margin-inline-end: 0;
+      margin-inline-start: 0.4rem;
+    }
+    .bn403-continue-btn--muted .bn403-continue-host::before {
+      content: none;
+      margin: 0;
+    }
+    .bn403-continue-btn:hover {
+      filter: brightness(1.05);
+      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1),
+        0 12px 32px rgba(34, 197, 94, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.32);
+      transform: translateY(-1px);
+    }
+    .bn403-continue-btn:active {
+      transform: translateY(2px);
+      filter: brightness(0.96);
+    }
+    .bn403-continue-btn:focus {
+      outline: none;
+    }
+    .bn403-continue-btn:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.95);
+      outline-offset: 3px;
+    }
+    html.dark .bn403-continue-btn:focus-visible {
+      outline-color: #86efac;
+    }
+    html.dark .bn403-continue-btn {
+      border-color: rgba(74, 222, 128, 0.35);
+      background: #28A377;
+    }
+    .bn403-continue-btn--muted {
+      cursor: not-allowed;
+      opacity: 0.55;
+      filter: grayscale(0.15);
+      box-shadow: none;
+      pointer-events: none;
+    }
+    .bn403-continue-btn--muted:hover,
+    .bn403-continue-btn--muted:active {
+      transform: none;
+      filter: grayscale(0.15);
+      box-shadow: none;
+    }
+    .bn403-continue-btn--muted:focus-visible {
+      outline-color: transparent;
+    }
+
+    .bn403-panel-foot {
+      margin-top: auto;
+      padding-top: 1.375rem;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      position: relative;
+      z-index: 1;
+    }
+    html.dark .bn403-panel-foot {
+      border-top-color: rgba(71, 85, 105, 0.45);
+    }
+
+    .bn403-waf {
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0;
+    }
+    .bn403-waf > span:first-child {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+    html.dark .bn403-waf > span:first-child {
+      color: #e5e7eb;
+    }
+    .bn403-waf sup {
+      vertical-align: super;
+      margin-left: 0.25rem;
+    }
+    .bn403-waf-badge {
+      margin-top: 0.125rem;
+      background: #22c55e;
+      font-weight: 900;
+      color: #fff;
+      border-radius: 0.25rem;
+      padding: 0 0.25rem;
+      font-size: 0.875rem;
+      transition: transform 0.2s ease;
+      display: inline-block;
+    }
+    .bn403-waf-badge:hover {
+      transform: scale(1.1);
+    }
+
+    .bn403-separator {
+      display: none;
+      width: 2px;
+      flex-shrink: 0;
+      margin: 0;
+      align-self: stretch;
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        #c5cdd9,
+        transparent
+      );
+      animation: fadeInSeparator 1s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    html.dark .bn403-separator {
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        #2e3a54,
+        transparent
+      );
+    }
+    @media (min-width: 768px) {
+      .bn403-separator {
+        display: block;
       }
-    </style>
+    }
+
+    .bn403-panel-right {
+      position: relative;
+      overflow: hidden;
+      flex: 1 1 0%;
+      background: #fdfefe;
+      border-radius: 0 0 1rem 1rem;
+      border: 1px solid #dbe0ea;
+      border-left: none;
+      border-top-color: transparent;
+      box-shadow: 0 12px 28px rgba(22, 32, 58, 0.08),
+        0 4px 10px rgba(22, 32, 58, 0.04);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-width: 0;
+      animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+      animation-delay: 0.1s;
+    }
+    html.dark .bn403-panel-right {
+      background: #232b3e;
+      border: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    }
+    @media (min-width: 768px) {
+      .bn403-panel-right {
+        border-radius: 0 1rem 1rem 0;
+        border: 1px solid #dbe0ea;
+        border-left: none;
+        padding: 3rem;
+      }
+      html.dark .bn403-panel-right {
+        border: none;
+      }
+    }
+
+    .bn403-info-title {
+      position: relative;
+      z-index: 10;
+      font-size: 1.5rem;
+      line-height: 2rem;
+      font-weight: 700;
+      margin: 0 0 1.25rem;
+      padding-bottom: 0.75rem;
+      color: #1f2937;
+      border-bottom: 2px solid rgba(232, 69, 69, 0.38);
+    }
+    html.dark .bn403-info-title {
+      color: #e5e7eb;
+      border-bottom-color: rgba(248, 113, 113, 0.45);
+    }
+
+    .bn403-info-sheet {
+      position: relative;
+      z-index: 10;
+      border-radius: 0.875rem;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 4px 22px rgba(22, 32, 58, 0.07);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    html.dark .bn403-info-sheet {
+      border-color: rgba(71, 85, 105, 0.5);
+      background: rgba(26, 35, 52, 0.52);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+    }
+    .bn403-info-sheet:hover {
+      border-color: rgba(148, 163, 184, 0.58);
+      box-shadow: 0 12px 36px rgba(22, 32, 58, 0.1);
+    }
+    html.dark .bn403-info-sheet:hover {
+      border-color: rgba(100, 116, 139, 0.48);
+    }
+
+    .bn403-info-list {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 0;
+      margin: 0;
+      font-size: 0.875rem;
+      line-height: 1.55;
+      counter-reset: bn403info;
+    }
+    .bn403-info-block {
+      position: relative;
+      display: grid;
+      grid-template-columns: 2.125rem minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      column-gap: 1rem;
+      row-gap: 0.35rem;
+      align-items: start;
+      padding: 1.125rem 1.25rem;
+      margin: 0;
+      text-align: start;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.32);
+      transition: background-color 0.18s ease;
+      counter-increment: bn403info;
+    }
+    .bn403-info-block:last-child {
+      border-bottom: none;
+    }
+    .bn403-info-block:hover {
+      background: rgba(248, 250, 252, 0.85);
+    }
+    html.dark .bn403-info-block:hover {
+      background: rgba(39, 50, 74, 0.45);
+    }
+    .bn403-info-block::before {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      align-self: start;
+      justify-self: center;
+      margin-top: 0.1rem;
+      content: counter(bn403info);
+      font-size: 0.75rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      min-width: 1.75rem;
+      height: 1.75rem;
+      padding: 0 0.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.45rem;
+      color: #be123c;
+      background: rgba(232, 69, 69, 0.12);
+      border: 1px solid rgba(232, 69, 69, 0.22);
+      box-shadow: 0 1px 2px rgba(22, 32, 58, 0.06);
+    }
+    html.dark .bn403-info-block::before {
+      color: #fecaca;
+      background: rgba(232, 69, 69, 0.22);
+      border-color: rgba(248, 113, 113, 0.35);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+    }
+    .bn403-info-block h3 {
+      grid-column: 2;
+      grid-row: 1;
+      font-size: 1.0625rem;
+      line-height: 1.45rem;
+      font-weight: 600;
+      margin: 0;
+      color: #1f2937;
+    }
+    html.dark .bn403-info-block h3 {
+      color: #f3f4f6;
+    }
+    .bn403-info-block p {
+      grid-column: 2;
+      grid-row: 2;
+      margin: 0;
+      color: #4b5563;
+    }
+    html.dark .bn403-info-block p {
+      color: #9ca3af;
+    }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.7) rotate(-8deg); }
+      80% { opacity: 1; transform: scale(1.08) rotate(2deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
+    @keyframes fadeInSeparator {
+      0% { opacity: 0; height: 0; }
+      100% { opacity: 1; height: 100%; }
+    }
+
+
+    /* Captcha page tweaks (aligned with WAF 403) */
+    body.bn403-page.bn-cap-page .bn403-ip-card {
+      margin-bottom: 1.25rem;
+    }
+    /* Larger challenge area: easier reCAPTCHA + submit (captcha page only). */
+    body.bn403-page.bn-cap-page .bn403-steps-sheet {
+      display: flex;
+      flex-direction: column;
+      min-height: clamp(16rem, 48vh, 28rem);
+    }
+    body.bn403-page.bn-cap-page .bn403-continue-sheet {
+      flex: 1 1 auto;
+      justify-content: center;
+      min-height: 0;
+      padding: clamp(1.75rem, 5vw, 3rem) clamp(1.25rem, 3vw, 2.25rem);
+      gap: clamp(1.35rem, 3.5vw, 2.25rem);
+    }
+    /* Single-column CAPTCHA: one centered card (no left/right split). */
+    body.bn403-page.bn-cap-page .bn403-main {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    @media (min-width: 768px) {
+      body.bn403-page.bn-cap-page .bn403-main {
+        flex-direction: column;
+        align-items: center;
+        min-height: auto;
+      }
+      body.bn403-page.bn-cap-page .bn403-panel-left.bn-cap-stack {
+        flex: 0 1 auto;
+      }
+    }
+    body.bn403-page.bn-cap-page .bn403-panel-left.bn-cap-stack {
+      width: min(52rem, 100%);
+      max-width: min(52rem, 100%);
+      margin-inline: auto;
+      border-radius: 1rem;
+      border-right: 1px solid #dbe0ea;
+      /* Let the language menu extend past the panel; parent overflow:hidden would clip it. */
+      overflow: visible;
+    }
+    /* All panel sections use z-index:1; without this, later siblings (title, IP, captcha) paint over the open menu. */
+    body.bn403-page.bn-cap-page .bn403-panel-left.bn-cap-stack > .bn403-panel-brand {
+      z-index: 30;
+    }
+    html.dark body.bn403-page.bn-cap-page .bn403-panel-left.bn-cap-stack {
+      border: none;
+    }
+    body.bn403-page.bn-cap-page .bn403-info-title {
+      margin-top: 1.75rem;
+    }
+    .bn-cap-captcha-form {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+      width: 100%;
+      margin: 0;
+    }
+    .bn-cap-captcha-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: clamp(9rem, 24vh, 15rem);
+      padding: clamp(0.75rem, 2vw, 1.5rem) clamp(0.5rem, 2vw, 1rem);
+      box-sizing: border-box;
+    }
+    .bn-cap-captcha-wrap .g-recaptcha {
+      display: inline-block;
+    }
+    input.bn403-continue-btn {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .bn-cap-lang {
+      position: relative;
+      display: inline-block;
+      max-width: min(100%, 18rem);
+      width: 100%;
+    }
+    .bn-cap-lang-select-sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+    .bn-cap-lang-btn {
+      font: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #e84545;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: min(100%, 18rem);
+      padding: 0.45rem 2rem 0.45rem 0.6rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      background-color: #fff;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      text-align: start;
+    }
+    .bn-cap-lang-btn-flag {
+      flex-shrink: 0;
+      width: 20px;
+      height: 14px;
+      object-fit: cover;
+      border-radius: 2px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+    .bn-cap-lang-btn-label {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .bn-cap-lang-btn-chevron {
+      flex-shrink: 0;
+      margin-inline-start: auto;
+      font-size: 0.65rem;
+      line-height: 1;
+      color: #e84545;
+      opacity: 0.85;
+    }
+    .bn-cap-lang-btn:focus {
+      outline: none;
+      border-color: rgba(232, 69, 69, 0.45);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+    html.dark .bn-cap-lang-btn {
+      background: #27324a;
+      border-color: #3d4f73;
+      color: #fecaca;
+    }
+    html.dark .bn-cap-lang-btn-chevron {
+      color: #fecaca;
+    }
+    .bn-cap-lang-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: auto;
+      z-index: 100;
+      margin: 0;
+      padding: 0.35rem 0;
+      min-width: 100%;
+      max-height: min(70vh, 22rem);
+      overflow-y: auto;
+      list-style: none;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      box-shadow: 0 10px 28px rgba(22, 32, 58, 0.15);
+    }
+    [dir="rtl"] .bn-cap-lang-menu {
+      left: auto;
+      right: 0;
+    }
+    html.dark .bn-cap-lang-menu {
+      background-color: #27324a;
+      border-color: #3d4f73;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+    }
+    .bn-cap-lang-menu > li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.85rem;
+      cursor: pointer;
+      color: #374151;
+      font-size: 0.875rem;
+    }
+    .bn-cap-lang-menu > li:hover,
+    .bn-cap-lang-menu > li.bn-cap-lang-item-active {
+      background: rgba(232, 69, 69, 0.08);
+    }
+    html.dark .bn-cap-lang-menu > li {
+      color: #e5e7eb;
+    }
+    html.dark .bn-cap-lang-menu > li:hover,
+    html.dark .bn-cap-lang-menu > li.bn-cap-lang-item-active {
+      background: rgba(252, 165, 165, 0.12);
+    }
+    .bn-cap-lang-item-flag {
+      flex-shrink: 0;
+      width: 20px;
+      height: 14px;
+      object-fit: cover;
+      border-radius: 2px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+    .bn-cap-lang-item-label {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .bn403-panel-brand-slot--lang {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      justify-content: flex-start;
+    }
+    [dir="rtl"] .bn403-panel-brand-slot--lang {
+      justify-content: flex-end;
+    }
+    .bn-cap-foot-check {
+      margin: 0 0 0.75rem;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+      color: #6b7280;
+      text-align: center;
+    }
+    html.dark .bn-cap-foot-check {
+      color: #9ca3af;
+    }
+    .bn403-info-block .bn-cap-info-body {
+      grid-column: 2;
+      grid-row: 2;
+      margin: 0;
+      color: #4b5563;
+      font-size: inherit;
+      line-height: 1.55;
+    }
+    html.dark .bn403-info-block .bn-cap-info-body {
+      color: #9ca3af;
+    }
+    .bn403-info-block.bn-cap-info-single {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto;
+      column-gap: 0;
+    }
+    .bn403-info-block.bn-cap-info-single::before {
+      display: none;
+    }
+    .bn403-info-block.bn-cap-info-single .bn-cap-info-body {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .noscript-banner {
+      max-width: 36rem;
+      margin: 1rem auto;
+      padding: 0 1rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bn403-ip-card,
+      .bn403-steps-sheet,
+      .bn403-info-sheet,
+      .bn403-info-block,
+      .bn403-continue-btn {
+        transition: none !important;
+      }
+      .bn403-ip-card:hover {
+        transform: none;
+      }
+      .bn403-steps-sheet:hover {
+        transform: none;
+      }
+      .bn403-continue-btn:hover,
+      .bn403-continue-btn:active {
+        transform: none;
+      }
+    }
+
+  </style>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script
@@ -342,7 +1020,7 @@
     ></script>
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0"
     />
 
     <script>
@@ -359,51 +1037,82 @@
     </script>
 
     <script>
-      function adaptiveColor(
-        hex,
-        darkColor = "#000000",
-        lightColor = "#FFFFFF"
-      ) {
-        if (hex.indexOf("#") === 0) {
-          hex = hex.slice(1);
-        }
-        // convert 3-digit hex to 6-digits.
-        if (hex.length === 3) {
-          hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-        }
-        if (hex.length !== 6) {
-          throw new Error("Invalid HEX color.");
-        }
-        let r = parseInt(hex.slice(0, 2), 16),
-          g = parseInt(hex.slice(2, 4), 16),
-          b = parseInt(hex.slice(4, 6), 16);
-
-        return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? darkColor : lightColor;
-      }
-    </script>
-
-    <script>
       var languages = {
         en: "English",
-        es: "Spanish",
+        il: "Hebrew",
+        he: "Hebrew",
         fr: "French",
-        gr: "Greek",
-        hu: "Hungarian",
-        id: "Bahasa Indonesia",
+        es: "Spanish",
+        sa: "Arabic",
+        de: "German",
+        hi: "Hindi",
+        in: "Hindi",
+        fa: "Persian",
+        ir: "Persian",
+        zh: "Chinese",
+        pt: "Portuguese",
+        ru: "Russian",
+        ja: "Japanese",
+        ko: "Korean",
         it: "Italian",
         nl: "Dutch",
         pl: "Polish",
-        pt: "Portuguese",
-        ru: "Russian",
         tr: "Turkish",
-        de: "German",
         vi: "Vietnamese",
+        id: "Indonesian",
+        uk: "Ukrainian",
+        ro: "Romanian",
+        cs: "Czech",
+        sv: "Swedish",
+        hu: "Hungarian",
+        el: "Greek",
+        gr: "Greek",
+        th: "Thai",
+        bn: "Bengali",
         dk: "Danish",
-        sa: "Arabic",
-        ja: "Japanese",
       };
 
-      var rtlLanguages = ["sa"];
+      /**
+       * ISO 3166-1 alpha-2 for flag images (native <select> cannot render flag emoji on Windows).
+       * PNGs from flagcdn.com — same host as many public flag CDNs; replace if CSP requires self-host.
+       */
+      var languageFlagIso = {
+        bn: "bd",
+        cs: "cz",
+        de: "de",
+        dk: "dk",
+        el: "gr",
+        en: "gb",
+        es: "es",
+        fa: "ir",
+        fr: "fr",
+        gr: "gr",
+        he: "il",
+        hi: "in",
+        hu: "hu",
+        id: "id",
+        il: "il",
+        in: "in",
+        ir: "ir",
+        it: "it",
+        ja: "jp",
+        ko: "kr",
+        nl: "nl",
+        pl: "pl",
+        pt: "pt",
+        ro: "ro",
+        ru: "ru",
+        sa: "sa",
+        sv: "se",
+        th: "th",
+        tr: "tr",
+        uk: "ua",
+        vi: "vn",
+        zh: "cn",
+      };
+      var languageFlagCdnBase = "https://flagcdn.com/w20/";
+
+      var rtlLanguages = ["sa", "he", "il", "fa", "ir"];
 
       var translations = {};
 
@@ -415,7 +1124,7 @@
         HEADING: "Warum ist das notwenig?",
         PRE_BODY: "Ihre IP Adresse",
         POST_BODY:
-          "wurde aus Sicherheitsgründen gesperrt.<br>Vermutlich wurde Ihre IP-Adresse zuvor für die Verletzung von Server-Sicherheitsregeln verwendet.<br>Wir müssen sicherstellen, dass dies kein bösartiger, automatisierter Besuch eines Roboters ist.<br>Nachdem Sie sich durch das <b>CAPTCHA</b> validiert haben, wird Ihre IP-Adresse aus der Greylist von BitNinja entfernt.",
+          "wurde aus Sicherheitsgründen gesperrt.<br>Vermutlich wurde Ihre IP-Adresse zuvor für die Verletzung von Server-Sicherheitsregeln verwendet.<br>Wir müssen sicherstellen, dass dies kein bösartiger, automatisierter Besuch eines Roboters ist.<br>Nachdem Sie sich durch das <b>CAPTCHA</b> validiert haben, wird Ihre IP-Adresse aus der Challenge-Liste von BitNinja entfernt.",
         BEST_REGARDS: "Vielen Dank.",
         SIGNATURE: "Das BitNinja Team",
         ACCESSING: "Zugriff",
@@ -433,7 +1142,7 @@
         HEADING: "Why is it necessary?",
         PRE_BODY: "Your IP address",
         POST_BODY:
-          "has been blocked for security reasons.<br>Probably your IP address has been used for violation of server security rules before.<br>We have to make sure that this is not a malicious, automated visit by a robot.<br>After you validate yourself by the <b>CAPTCHA</b>, your IP will be removed from BitNinja's greylist.",
+          "has been blocked for security reasons.<br>Probably your IP address has been used for violation of server security rules before.<br>We have to make sure that this is not a malicious, automated visit by a robot.<br>After you validate yourself by the <b>CAPTCHA</b>, your IP will be removed from BitNinja's challenge list.",
         BEST_REGARDS: "Thank you.",
         SIGNATURE: "The BitNinja Team",
         ACCESSING: "Accessing",
@@ -452,7 +1161,7 @@
         PRE_BODY:
           "Su dirección IP actual ha sido bloqueada por razones de seguridad. Probablemente su IP ha sido utilizada anteriormente para infringir la seguridad de algún servidor de la red Bit-Ninja.",
         POST_BODY:
-          "Necesitamos estar seguros de que quien esté detras del computador sea una persona y no el software de un Hacker. Por favor rellene el Captcha. Al rellenar correctamente el Captcha, su IP actual, será eliminada automáticamente de nuestra lista de IP's maliciosas.",
+          "Necesitamos estar seguros de que quien esté detras del computador sea una persona y no el software de un Hacker. Por favor rellene el Captcha. Al rellenar correctamente el Captcha, su IP actual se eliminará automáticamente de la lista challenge de BitNinja.",
         BEST_REGARDS: "Muchas Gracias.",
         SIGNATURE: "El equipo de BitNinja ",
         ACCESSING: "Accediendo a",
@@ -471,7 +1180,7 @@
         HEADING: "Pourquoi est-ce nécessaire?",
         PRE_BODY: "Votre adresse IP",
         POST_BODY:
-          "a été bloquée pour des raisons de sécurité.<br>Votre adresse IP a probablement déjà été utilisée pour violation des règles de sécurité du serveur.<br>Nous devons nous assurer qu'il ne s'agit pas d'une visite malveillante et automatisée d'un bot.<br>Après s'être validé à travers le <b>CAPTCHA</b>, votre adresse IP sera supprimée de la liste grise de BitNinja.",
+          "a été bloquée pour des raisons de sécurité.<br>Votre adresse IP a probablement déjà été utilisée pour violation des règles de sécurité du serveur.<br>Nous devons nous assurer qu'il ne s'agit pas d'une visite malveillante et automatisée d'un bot.<br>Après s'être validé à travers le <b>CAPTCHA</b>, votre adresse IP sera supprimée de la liste des challenges BitNinja.",
         BEST_REGARDS: "Merci.",
         SIGNATURE: "L'équipe BitNinja",
         ACCESSING: "Ouverture",
@@ -490,9 +1199,15 @@
         HEADING: "Γιατί είναι απαραίτητο;",
         PRE_BODY: "Η διεύθυνση IP",
         POST_BODY:
-          "έχει μπλοκαριστεί για λόγους ασφαλείας.<br>Ενδεχομένως η διεύθυνση IP σας να έχει χρησιμοποιηθεί για παράβαση των κανονισμών ασφάλειας του  εξυπηρετητή στο παρελθόν.<br>Πρέπει να βεβαιωθούμε πως αυτό δεν είναι μια κακόβουλη, αυτόματη επίσκεψη από ένα ρομπότ.<br>Μετά την ταυτοποίηση σας από το Captcha, η IP σας θα αφαιρεθεί από τη γκρίζα λίστα του BitNinja.",
+          "έχει μπλοκαριστεί για λόγους ασφαλείας.<br>Ενδεχομένως η διεύθυνση IP σας να έχει χρησιμοποιηθεί για παράβαση των κανονισμών ασφάλειας του  εξυπηρετητή στο παρελθόν.<br>Πρέπει να βεβαιωθούμε πως αυτό δεν είναι μια κακόβουλη, αυτόματη επίσκεψη από ένα ρομπότ.<br>Μετά την ταυτοποίηση σας από το Captcha, η IP σας θα αφαιρεθεί από τη λίστα challenge του BitNinja.",
         BEST_REGARDS: "Σας ευχαριστούμε.",
         SIGNATURE: "Η ομάδα του BitNinja",
+        ACCESSING: "Πρόσβαση",
+        SECURELY: "με ασφάλεια.",
+        PROCESS:
+          "Αυτή είναι μια αυτόματη διαδικασία. Ο περιηγητής σας θα μεταφερθεί στο ζητούμενο περιεχόμενο σε",
+        SECONDS: "δευτερόλεπτα.",
+        CHECK: "Έλεγχος ασφαλείας από το BitNinja.IO",
         YOUR_IP: "τη διεύθυνση IP σας",
       };
       translations["hu"] = {
@@ -522,9 +1237,15 @@
         HEADING: "Mengapa ini wajib dilakukan?",
         PRE_BODY: "Alamat IP Anda",
         POST_BODY:
-          "telah diblokir karena alasan keamanan.<br>Kemungkinan besar alamat IP Anda telah digunakan untuk melanggar aturan keamanan server sebelumnya.<br>Kami harus memastikan bahwa ini tidak berbahaya, kunjungan otomatis oleh robot.<br>Setelah memvalidasi diri dengan Captcha, IP Anda akan dihapus dari daftar abu-abu BitNinja.",
+          "telah diblokir karena alasan keamanan.<br>Kemungkinan besar alamat IP Anda telah digunakan untuk melanggar aturan keamanan server sebelumnya.<br>Kami harus memastikan bahwa ini tidak berbahaya, kunjungan otomatis oleh robot.<br>Setelah memvalidasi diri dengan Captcha, IP Anda akan dihapus dari daftar challenge BitNinja.",
         BEST_REGARDS: "Terima kasih.",
         SIGNATURE: "Tim BitNinja",
+        ACCESSING: "Mengakses",
+        SECURELY: "dengan aman.",
+        PROCESS:
+          "Ini adalah proses otomatis. Peramban Anda akan mengarahkan ke konten yang diminta dalam",
+        SECONDS: "detik.",
+        CHECK: "Pemeriksaan keamanan oleh BitNinja.IO",
         YOUR_IP: "alamat IP Anda",
       };
       translations["it"] = {
@@ -535,7 +1256,7 @@
         HEADING: "Perché è necessario?",
         PRE_BODY: "Il tuo indirizzo IP",
         POST_BODY:
-          "è stato bloccato per ragioni di sicurezza.<br>E' probabile che il tuo indirizzo IP sia stato usato in precedenza per la violazione delle norme di sicurezza del server.<br>Dobbiamo assicurarci che questa non sia una visita da parte di un robot automatico.<br>Dopo la verifica della tua identità attraverso il <b>CAPTCHA</b>, il tuo IP verrà rimosso dalla greylist di BitNinja.",
+          "è stato bloccato per ragioni di sicurezza.<br>E' probabile che il tuo indirizzo IP sia stato usato in precedenza per la violazione delle norme di sicurezza del server.<br>Dobbiamo assicurarci che questa non sia una visita da parte di un robot automatico.<br>Dopo la verifica della tua identità attraverso il <b>CAPTCHA</b>, il tuo IP verrà rimosso dalla lista challenge di BitNinja.",
         BEST_REGARDS: "Grazie.",
         SIGNATURE: "Il Team di BitNinja",
         ACCESSING: "Accesso",
@@ -554,7 +1275,7 @@
         HEADING: "Waarom is het noodzakelijk?",
         PRE_BODY: "Uw IP-adres",
         POST_BODY:
-          "is vanwege veiligheidsmaatregelen geblokkeerd.<br>Uw IP-adres is waarschijnlijk geblokkeerd vanwege het eerder overtreden van de veiligheidsregels van de server.<br>Wij moeten zeker weten dat dit geen kwaadaardig en automatisch bezoek is van een robot.<br>Nadat u zichzelf heeft gevalideerd met de <b>CAPTCHA</b>, zal uw IP van BitNinja's grijze lijst worden verwijderd.",
+          "is vanwege veiligheidsmaatregelen geblokkeerd.<br>Uw IP-adres is waarschijnlijk geblokkeerd vanwege het eerder overtreden van de veiligheidsregels van de server.<br>Wij moeten zeker weten dat dit geen kwaadaardig en automatisch bezoek is van een robot.<br>Nadat u zichzelf heeft gevalideerd met de <b>CAPTCHA</b>, zal uw IP van BitNinja's challenge-lijst worden verwijderd.",
         BEST_REGARDS: "Dank u.",
         SIGNATURE: "Het BitNinja Team",
         ACCESSING: "Veilig toegang krijgen tot",
@@ -573,7 +1294,7 @@
         HEADING: "Dlaczego to jest konieczne?",
         PRE_BODY: "Twój adres IP",
         POST_BODY:
-          "został zablokowany z powodów bezpieczeństwa.<br>Prawdopodobnie twój adres IP został wcześniej użyty do naruszenia zasad bezpieczeństwa serwera.<br>Musimy się upewnić, że to nie jest złośliwa automatyczna wizyta robota.<br>Po walidacji przez Captcha twoje IP zostanie usunięte z szarej listy BitNinja.",
+          "został zablokowany z powodów bezpieczeństwa.<br>Prawdopodobnie twój adres IP został wcześniej użyty do naruszenia zasad bezpieczeństwa serwera.<br>Musimy się upewnić, że to nie jest złośliwa automatyczna wizyta robota.<br>Po walidacji przez Captcha twoje IP zostanie usunięte z listy wyzwań BitNinja.",
         BEST_REGARDS: "Dziękujemy.",
         SIGNATURE: "Ekipa BitNinja",
         ACCESSING: "Bezpieczne ładowanie",
@@ -592,7 +1313,7 @@
         HEADING: "Porquê é necessário?",
         PRE_BODY: "O seu endereço IP",
         POST_BODY:
-          "oi bloqueado por razões de segurança.<br>Provavelmente o seu endereço IP foi usado antes para violar as regras do servidor.<br>Nós temos de ter a certeza que isto não é malicioso, como uma visita automática efectuada por um robot.<br>Depois de você se validar pelo Captcha, o seu IP será removido da greylist do BitNinja.",
+          "oi bloqueado por razões de segurança.<br>Provavelmente o seu endereço IP foi usado antes para violar as regras do servidor.<br>Nós temos de ter a certeza que isto não é malicioso, como uma visita automática efectuada por um robot.<br>Depois de você se validar pelo Captcha, o seu IP será removido da lista challenge do BitNinja.",
         BEST_REGARDS: "Obrigado.",
         SIGNATURE: "A equipa BitNinja",
         YOUR_IP: "seu endereço IP",
@@ -605,7 +1326,7 @@
         HEADING: "Почему это важно?",
         PRE_BODY: "Ваш IP-адрес",
         POST_BODY:
-          "был заблокирован по соображениям безопасности.<br>Ваш IP-адрес вероятно использовалсья для нарушения правилов безопасности сервера раньше.<br>Мы хотим удостовериться в том, что это не вредоносного автоматического посещения роботом.<br>После вашей проверки кодом Captcha ваш IP-адрес будет удалён из серого списка BitNinja.",
+          "был заблокирован по соображениям безопасности.<br>Ваш IP-адрес вероятно использовалсья для нарушения правилов безопасности сервера раньше.<br>Мы хотим удостовериться в том, что это не вредоносного автоматического посещения роботом.<br>После вашей проверки кодом Captcha ваш IP-адрес будет удалён из challenge-листа BitNinja.",
         BEST_REGARDS: "Большое спасибо.",
         SIGNATURE: "Группа BitNinja",
         ACCESSING: "получать доступ к",
@@ -624,7 +1345,7 @@
         HEADING: "Neden gereklidir?",
         PRE_BODY: "IP adresiniz",
         POST_BODY:
-          "güvenlik nedeniyle engellendi.<br>Büyük ihtimal ki, IP adresiniz önce sunucu güvenlik kurallarının ihlali için kullanılmıştır.<br>Bunun bir robot tarafından kötü niyetli, otomatik bir ziyaret olmasından emin olmalıyız.<br>Captcha tarafından onaylandıktan sonra, IP adresiniz BitNinja'nın greylistinden kaldırılacaktır.",
+          "güvenlik nedeniyle engellendi.<br>Büyük ihtimal ki, IP adresiniz önce sunucu güvenlik kurallarının ihlali için kullanılmıştır.<br>Bunun bir robot tarafından kötü niyetli, otomatik bir ziyaret olmasından emin olmalıyız.<br>Captcha tarafından onaylandıktan sonra, IP adresiniz BitNinja'nın challenge listesinden kaldırılacaktır.",
         BEST_REGARDS: "Teşekkür ederim.",
         SIGNATURE: "BitNinja Takımı",
         ACCESSING: "Erişim",
@@ -643,7 +1364,7 @@
         HEADING: "Vì sao việc này cần thiết?",
         PRE_BODY: "IP của bạn là",
         POST_BODY:
-          "đã bị chặn vì lý do an toàn. Có lẽ IP của bạn trước đây đã được sử dụng để tham gia các hoạt động vi phạm các quy định bảo mật của hệ thống máy chủ. Chúng tôi cần phải đảm bảo rằng truy cập này không độc hại và tự động được thực hiện bởi robot. Sau khi xác thực bằng mã Captcha, IP của bạn sẽ được gỡ khỏi danh sách xám của BitNinja.",
+          "đã bị chặn vì lý do an toàn. Có lẽ IP của bạn trước đây đã được sử dụng để tham gia các hoạt động vi phạm các quy định bảo mật của hệ thống máy chủ. Chúng tôi cần phải đảm bảo rằng truy cập này không độc hại và tự động được thực hiện bởi robot. Sau khi xác thực bằng mã Captcha, IP của bạn sẽ được gỡ khỏi danh sách challenge của BitNinja.",
         BEST_REGARDS: "Cảm ơn",
         SIGNATURE: "Đội ngũ BitNinja",
         YOUR_IP: "địa chỉ IP của bạn",
@@ -656,7 +1377,7 @@
         HEADING: "Hvorfor er det nødvendigt?",
         PRE_BODY: "Din IP-adresse ",
         POST_BODY:
-          "er blevet blokeret af sikkerhedsmæssige årsager.<br>Din IP-adresse er formentlig blevet brugt til at omgå serversikkerhedsregler på et tidligere tidspunkt.<br>Vi er derfor nødt til at sikre os, at dette ikke er et ondsindet, automatisk besøg foretaget af en robot.<br>Du kan blive valideret ved hjælp af CAPTCHAen, hvorefter din IP vil blive fjernet fra BitNinjas grå liste.",
+          "er blevet blokeret af sikkerhedsmæssige årsager.<br>Din IP-adresse er formentlig blevet brugt til at omgå serversikkerhedsregler på et tidligere tidspunkt.<br>Vi er derfor nødt til at sikre os, at dette ikke er et ondsindet, automatisk besøg foretaget af en robot.<br>Du kan blive valideret ved hjælp af CAPTCHAen, hvorefter din IP vil blive fjernet fra BitNinjas challenge-liste.",
         BEST_REGARDS: "På forhånd tak,",
         SIGNATURE: "Teamet hos BitNinja",
         ACCESSING: "Adgand",
@@ -668,15 +1389,22 @@
         YOUR_IP: "Din IP-adresse",
       };
       translations["sa"] = {
-        TITLE: "",
+        TITLE: "زائرنا الكريم",
         SUBTITLE:
           "﻿لمتابعة التصفح ومساعدتنا في مكافحة الجرائم الإلكترونية ، يرجى حل اختبار <b>CAPTCHA</b> الذي تراه أدناه.",
+        SUBMIT: "إزالة من القائمة",
         HEADING: "لماذا هو ضروري؟",
         PRE_BODY: "تم حظر عنوان IP الخاص بك ",
         POST_BODY:
-          " لأسباب أمنية.<br> ربما تم استخدام عنوان IP الخاص بك لانتهاك قواعد أمان الخادم من قبل.<br> علينا أن نتأكد من أن هذه ليست زيارة ضارة آلية من قبل الروبوت. بعد التحقق من صحة نفسك بواسطة اختبار <b>CAPTCHA</b> ، ستتم إزالة عنوان IP الخاص بك من قائمة BitNinja.",
+          " لأسباب أمنية.<br> ربما تم استخدام عنوان IP الخاص بك لانتهاك قواعد أمان الخادم من قبل.<br> علينا أن نتأكد من أن هذه ليست زيارة ضارة آلية من قبل الروبوت. بعد التحقق من صحة نفسك بواسطة اختبار <b>CAPTCHA</b> ، ستتم إزالة عنوان IP الخاص بك من قائمة التحديات لـ BitNinja.",
         BEST_REGARDS: "شكرا لكم.",
         SIGNATURE: "شكرا لكم. فريق BitNinja",
+        ACCESSING: "جارٍ الوصول",
+        SECURELY: "بأمان.",
+        PROCESS:
+          "هذه عملية تلقائية. سيوجّه المتصفح إلى المحتوى المطلوب خلال",
+        SECONDS: "ثوانٍ.",
+        CHECK: "فحص أمني من BitNinja.IO",
         YOUR_IP: "عنوان IP الخاص بك",
       };
       translations["ja"] = {
@@ -687,7 +1415,7 @@
         HEADING: "なぜ必要なのですか？",
         PRE_BODY: "セキュリティ上の理由であなたのIPアドレス",
         POST_BODY:
-          "はブロックされています。<br>おそらくあなたのIPアドレスは以前にサーバーセキュリティルール違反に利用されたと考えられます。<br>当社はあなたの訪問がロボットによる悪意のある自動化された訪問ではないことを確認する必要があります。<br>キャプチャを実行し検証した後、あなたのIPアドレスはBitNinjaのグレーリストから削除されます。",
+          "はブロックされています。<br>おそらくあなたのIPアドレスは以前にサーバーセキュリティルール違反に利用されたと考えられます。<br>当社はあなたの訪問がロボットによる悪意のある自動化された訪問ではないことを確認する必要があります。<br>キャプチャを実行し検証した後、あなたのIPアドレスはBitNinjaのチャレンジリストから削除されます。",
         BEST_REGARDS: "よろしくお願いいたします。",
         SIGNATURE: "BitNinjaチーム",
         ACCESSING: "アクセス中",
@@ -697,6 +1425,218 @@
         SECONDS: "秒",
         CHECK: "BitNinja.IOによるセキュリティチェック",
         YOUR_IP: "あなたのIPアドレス",
+      };
+      translations["el"] = translations["gr"];
+      translations["fa"] = {
+        TITLE: "بازدیدکنندهٔ گرامی",
+        SUBTITLE:
+          "برای ادامهٔ مرور و کمک به مبارزه با جرایم سایبری، لطفاً <b>کپچا</b>ی زیر را حل کنید.",
+        SUBMIT: "خروج از فهرست",
+        HEADING: "چرا این کار لازم است؟",
+        PRE_BODY: "آدرس IP شما",
+        POST_BODY:
+          "به‌دلیل مسائل امنیتی مسدود شده است.<br>احتمالاً پیش‌تر برای نقض قوانین امنیتی سرور از این آدرس IP استفاده شده است.<br>باید مطمئن شویم این بازدید خودکار و مخرب توسط یک ربات نیست.<br>پس از تأیید با <b>CAPTCHA</b>، آدرس IP شما از لیست چالش BitNinja حذف می‌شود.",
+        BEST_REGARDS: "متشکرم.",
+        SIGNATURE: "تیم BitNinja",
+        ACCESSING: "در حال دسترسی",
+        SECURELY: "به‌شکل ایمن.",
+        PROCESS:
+          "این یک فرایند خودکار است. مرورگر شما چند ثانیه دیگر به محتوای درخواستی بازمی‌گرداند.",
+        SECONDS: "",
+        CHECK: "بررسی امنیت توسط BitNinja.IO",
+        YOUR_IP: "آدرس IP شما",
+      };
+      translations["ir"] = translations["fa"];
+      translations["he"] = {
+        TITLE: "מבקר יקר",
+        SUBTITLE:
+          "כדי להמשיך בגלישה ולסייע לנו במאבק בפשע הסייבר, נא לפתור את ה־<b>CAPTCHA</b> שלמטה.",
+        SUBMIT: "הסר מהרשימה",
+        HEADING: "למה זה נחוץ?",
+        PRE_BODY: "כתובת ה־IP שלך",
+        POST_BODY:
+          "נחסמה מטעמי אבטחה.<br>ייתכן שכתובת ה־IP שלך שימשה בעבר להפרת כללי אבטחת השרת.<br>עלינו לוודא שמדובר בביקור תקף ולא בביקור אוטומטי זדוני של רובוט.<br>לאחר אימות באמצעות ה־<b>CAPTCHA</b>, כתובת ה־IP תוסר מרשימת ה־challenge של BitNinja.",
+        BEST_REGARDS: "תודה.",
+        SIGNATURE: "צוות BitNinja",
+        ACCESSING: "מתחבר",
+        SECURELY: "באופן מאובטח.",
+        PROCESS:
+          "זוהי פעולה אוטומטית. הדפדפן יפנה אותך לתוכן המבוקש תוך",
+        SECONDS: "שניות",
+        CHECK: "בדיקת אבטחה של BitNinja.IO",
+        YOUR_IP: "כתובת ה־IP שלך",
+      };
+      translations["il"] = translations["he"];
+      translations["hi"] = {
+        TITLE: "प्रिय आगंतुक",
+        SUBTITLE:
+          "ब्राउज़िंग जारी रखने और साइबर अपराध से लड़ने में हमारी मदद करने के लिए कृपया नीचे दिखाई देने वाली <b>CAPTCHA</b> हल करें।",
+        SUBMIT: "सूची से हटाएँ",
+        HEADING: "यह आवश्यक क्यों है?",
+        PRE_BODY: "आपका IP पता",
+        POST_BODY:
+          "सुरक्षा कारणों से अवरुद्ध कर दिया गया है।<br>संभवतः आपके IP पते का पहले सर्वर सुरक्षा नियमों का उल्लंघन करने के लिए उपयोग किया गया था।<br>हमें यह सुनिश्चित करना होगा कि यह किसी रोबोट की दुर्भावनापूर्ण स्वचालित विजिट नहीं है।<br><b>CAPTCHA</b> द्वारा सत्यापन के बाद, आपके IP को BitNinja की चुनौती सूची से हटा दिया जाएगा।",
+        BEST_REGARDS: "धन्यवाद।",
+        SIGNATURE: "BitNinja टीम",
+        ACCESSING: "पहुँच",
+        SECURELY: "सुरक्षित रूप से।",
+        PROCESS:
+          "यह स्वचालित प्रक्रिया है। आपका ब्राउज़र कुछ",
+        SECONDS: "सेकंड में अनुरोधित सामग्री पर पुनर्निर्देशित करेगा।",
+        CHECK: "BitNinja.IO द्वारा सुरक्षा जाँच",
+        YOUR_IP: "आपका IP पता",
+      };
+      translations["in"] = translations["hi"];
+      translations["zh"] = {
+        TITLE: "尊敬的访客",
+        SUBTITLE:
+          "请完成下方的 <b>验证码（CAPTCHA）</b>，以便继续浏览并协助我们防范网络犯罪。",
+        SUBMIT: "解除列入",
+        HEADING: "为什么需要这一步？",
+        PRE_BODY: "您的 IP 地址",
+        POST_BODY:
+          "因安全原因已被阻止。<br>该 IP 可能曾用于违反服务器安全规则。<br>我们需要确认此次访问并非恶意的自动化机器人。<br>通过 <b>CAPTCHA</b> 验证后，您的 IP 将从 BitNinja 的挑战名单中移除。",
+        BEST_REGARDS: "谢谢。",
+        SIGNATURE: "BitNinja 团队",
+        ACCESSING: "正在访问",
+        SECURELY: "安全连接。",
+        PROCESS: "此为自动流程。您的浏览器将在数",
+        SECONDS: "秒后跳转到请求的内容。",
+        CHECK: "BitNinja.IO 安全检查",
+        YOUR_IP: "您的 IP 地址",
+      };
+      translations["ko"] = {
+        TITLE: "방문자님께",
+        SUBTITLE:
+          "브라우징을 계속하고 사이버 범죄 대응에 협조하시려면 아래 <b>CAPTCHA</b>를 풀어 주세요.",
+        SUBMIT: "목록에서 제거",
+        HEADING: "왜 필요한가요?",
+        PRE_BODY: "귀하의 IP 주소",
+        POST_BODY:
+          "는 보안상의 이유로 차단되었습니다.<br>이전에 해당 IP가 서버 보안 규칙을 위반하는 데 사용되었을 수 있습니다.<br>악의적인 자동화 봇의 방문이 아님을 확인해야 합니다.<br><b>CAPTCHA</b>로 본인 확인 후 IP는 BitNinja 챌린지 리스트에서 제거됩니다.",
+        BEST_REGARDS: "감사합니다.",
+        SIGNATURE: "BitNinja 팀",
+        ACCESSING: "접속 중",
+        SECURELY: "안전하게.",
+        PROCESS:
+          "자동 처리됩니다. 브라우저가 몇",
+        SECONDS: "초 안에 요청한 콘텐츠로 이동합니다.",
+        CHECK: "BitNinja.IO 보안 확인",
+        YOUR_IP: "귀하의 IP 주소",
+      };
+      translations["uk"] = {
+        TITLE: "Шановний відвідувачу",
+        SUBTITLE:
+          "Щоб продовжити перегляд і допомогти нам боротися з кіберзлочинністю, розв’яжіть <b>CAPTCHA</b> нижче.",
+        SUBMIT: "Прибрати зі списку",
+        HEADING: "Навіщо це потрібно?",
+        PRE_BODY: "Ваша IP-адреса",
+        POST_BODY:
+          "заблокована з міркувань безпеки.<br>Ймовірно, раніше цю IP використовували для порушення правил безпеки сервера.<br>Ми маємо переконатися, що це не зловмисний автоматичний візит робота.<br>Після перевірки за допомогою <b>CAPTCHA</b> вашу IP буде видалено з challenge-списку BitNinja.",
+        BEST_REGARDS: "Дякуємо.",
+        SIGNATURE: "Команда BitNinja",
+        ACCESSING: "Доступ",
+        SECURELY: "безпечно.",
+        PROCESS:
+          "Це автоматичний процес. Ваш браузер перенаправить на потрібний вміст за",
+        SECONDS: "секунд.",
+        CHECK: "Перевірка безпеки BitNinja.IO",
+        YOUR_IP: "ваша IP-адреса",
+      };
+      translations["ro"] = {
+        TITLE: "Dragă vizitator",
+        SUBTITLE:
+          "Pentru a continua navigarea și a ne ajuta în lupta împotriva infracționalității cibernetice, rezolvați <b>CAPTCHA</b>-ul de mai jos.",
+        SUBMIT: "Elimină din listă",
+        HEADING: "De ce este necesar?",
+        PRE_BODY: "Adresa dvs. IP",
+        POST_BODY:
+          "a fost blocată din motive de securitate.<br>Probabil adresa dumneavoastră IP a fost folosită anterior pentru încălcarea regulilor de securitate ale serverului.<br>Trebuie să ne asigurăm că aceasta nu este o vizită automată și rău intenționată a unui robot.<br>După validarea prin <b>CAPTCHA</b>, IP-ul va fi eliminat din lista challenge BitNinja.",
+        BEST_REGARDS: "Mulțumim.",
+        SIGNATURE: "Echipa BitNinja",
+        ACCESSING: "Acces",
+        SECURELY: "în siguranță.",
+        PROCESS:
+          "Acesta este un proces automat. Browserul vă va redirecționa către conținutul solicitat în",
+        SECONDS: "secunde.",
+        CHECK: "Verificare de securitate BitNinja.IO",
+        YOUR_IP: "adresa dumneavoastră IP",
+      };
+      translations["cs"] = {
+        TITLE: "Vážený návštěvníku",
+        SUBTITLE:
+          "Chcete-li pokračovat v prohlížení a pomoci nám bojovat s kyberkriminalitou, vyřešte níže zobrazené <b>CAPTCHA</b>.",
+        SUBMIT: "Odebrat ze seznamu",
+        HEADING: "Proč je to nutné?",
+        PRE_BODY: "Vaše IP adresa",
+        POST_BODY:
+          "byla z bezpečnostních důvodů zablokována.<br>Pravděpodobně již byla vaše IP adresa použita k porušení bezpečnostních pravidel serveru.<br>Musíme ověřit, že se nejedná o škodlivou automatickou návštěvu robota.<br>Po ověření pomocí <b>CAPTCHA</b> bude vaše IP adresa odebrána z challenge listiny BitNinja.",
+        BEST_REGARDS: "Děkujeme.",
+        SIGNATURE: "Tým BitNinja",
+        ACCESSING: "Přístup",
+        SECURELY: "zabezpečeně.",
+        PROCESS:
+          "Jde o automatický proces. Váš prohlížeč vás přesměruje na požadovaný obsah během",
+        SECONDS: "sekund.",
+        CHECK: "Bezpečnostní kontrola BitNinja.IO",
+        YOUR_IP: "vaše IP adresa",
+      };
+      translations["sv"] = {
+        TITLE: "Bäste besökare",
+        SUBTITLE:
+          "För att fortsätta surfa och hjälpa oss bekämpa cyberbrottslighet, lös <b>CAPTCHA</b> nedan.",
+        SUBMIT: "Ta bort från listan",
+        HEADING: "Varför behövs detta?",
+        PRE_BODY: "Din IP-adress",
+        POST_BODY:
+          "har blockerats av säkerhetsskäl.<br>Troligen har din IP-adress tidigare använts för att bryta mot serverns säkerhetsregler.<br>Vi måste säkerställa att detta inte är ett skadligt, automatiskt besök från en robot.<br>Efter validering med <b>CAPTCHA</b> tas din IP-adress bort från BitNinjas challenge-lista.",
+        BEST_REGARDS: "Tack.",
+        SIGNATURE: "BitNinja-teamet",
+        ACCESSING: "Åtkomst",
+        SECURELY: "säkert.",
+        PROCESS:
+          "Detta är en automatisk process. Din webbläsare omdirigerar till det begärda innehållet inom",
+        SECONDS: "sekunder.",
+        CHECK: "Säkerhetskontroll av BitNinja.IO",
+        YOUR_IP: "din IP-adress",
+      };
+      translations["th"] = {
+        TITLE: "เรียนผู้เยี่ยมชม",
+        SUBTITLE:
+          "เพื่อให้สามารถเรียกดูต่อและช่วยเราต่อสู้กับอาชญากรรมไซเบอร์ กรุณาแก้ <b>CAPTCHA</b> ด้านล่าง",
+        SUBMIT: "นำออกจากรายการ",
+        HEADING: "ทำไมจึงจำเป็น?",
+        PRE_BODY: "ที่อยู่ IP ของคุณ",
+        POST_BODY:
+          "ถูกบล็อกด้วยเหตุผลด้านความปลอดภัย<br>เป็นไปได้ว่าที่อยู่ IP ของคุณเคยถูกใช้ละเมิดกฎความปลอดภัยของเซิร์ฟเวอร์มาก่อน<br>เราต้องแน่ใจว่านี่ไม่ใช่การเข้าชมแบบอัตโนมัติที่เป็นอันตรายจากบอท<br>หลังยืนยันตัวด้วย <b>CAPTCHA</b> แล้ว ที่อยู่ IP ของคุณจะถูกนำออกจากรายการ challenge ของ BitNinja",
+        BEST_REGARDS: "ขอบคุณ",
+        SIGNATURE: "ทีม BitNinja",
+        ACCESSING: "กำลังเข้าถึง",
+        SECURELY: "อย่างปลอดภัย",
+        PROCESS:
+          "นี่เป็นกระบวนการอัตโนมัติ เบราว์เซอร์ของคุณจะเปลี่ยนเส้นทางไปยังเนื้อหาที่ขอภายใน",
+        SECONDS: "วินาที",
+        CHECK: "การตรวจสอบความปลอดภัยโดย BitNinja.IO",
+        YOUR_IP: "ที่อยู่ IP ของคุณ",
+      };
+      translations["bn"] = {
+        TITLE: "প্রিয় দর্শক",
+        SUBTITLE:
+          "ব্রাউজিং চালিয়ে যেতে এবং সাইবার অপরাধের বিরুদ্ধে লড়াইয়ে সাহায্য করতে নিচের <b>CAPTCHA</b> সমাধান করুন।",
+        SUBMIT: "তালিকা থেকে সরান",
+        HEADING: "এটি কেন প্রয়োজন?",
+        PRE_BODY: "আপনার IP ঠিকানা",
+        POST_BODY:
+          "নিরাপত্তার কারণে ব্লক করা হয়েছে।<br>সম্ভবত আপনার IP ঠিকানা আগে সার্ভারের নিরাপত্তা নীতি লঙ্ঘনের জন্য ব্যবহৃত হয়েছে।<br>আমাদের নিশ্চিত হতে হবে এটি কোনো রোবটের ক্ষতিকারক স্বয়ংক্রিয় ভিজিট নয়।<br><b>CAPTCHA</b> যাচাইয়ের পর আপনার IP BitNinja-র চ্যালেঞ্জ তালিকা থেকে সরানো হবে।",
+        BEST_REGARDS: "ধন্যবাদ।",
+        SIGNATURE: "BitNinja টিম",
+        ACCESSING: "প্রবেশ করা হচ্ছে",
+        SECURELY: "নিরাপদে।",
+        PROCESS:
+          "এটি স্বয়ংক্রিয় প্রক্রিয়া। আপনার ব্রাউজার কয়েক",
+        SECONDS: "সেকেন্ডের মধ্যে অনুরোধকৃত বিষয়বস্তুতে নির্দেশ দেবে।",
+        CHECK: "BitNinja.IO-র নিরাপত্তা পরীক্ষা",
+        YOUR_IP: "আপনার IP ঠিকানা",
       };
     </script>
 
@@ -792,131 +1732,358 @@
         return null;
       }
     </script>
+    <script>
+    function bnCaptchaResolveDark() {
+      try {
+        var t = localStorage.theme;
+        if (t === "dark") return true;
+        if (t === "light") return false;
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+      } catch (e) {
+        return false;
+      }
+    }
+    function bnCaptchaApplyTheme() {
+      document.documentElement.classList.toggle("dark", bnCaptchaResolveDark());
+      var icon = document.getElementById("theme-toggle-icon");
+      if (!icon) return;
+      icon.textContent = document.documentElement.classList.contains("dark")
+        ? String.fromCodePoint(0x2600, 0xfe0f)
+        : String.fromCodePoint(0x1f319);
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+      var btn = document.getElementById("theme-toggle");
+      if (btn) {
+        btn.addEventListener("click", function () {
+          localStorage.theme = document.documentElement.classList.contains("dark")
+            ? "light"
+            : "dark";
+          bnCaptchaApplyTheme();
+        });
+      }
+      bnCaptchaApplyTheme();
+    });
+    try {
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+        if (!("theme" in localStorage)) bnCaptchaApplyTheme();
+      });
+    } catch (e) {}
+    </script>
+
   </head>
 
-  <body>
-    <div class="page-container">
-      <div class="contact-support info">
-        <!--
-        <div>
-            <p>Company</p>
-            <p>info@company.com</p>
+  <body class="bn403-page bn-cap-page">
+  <button id="theme-toggle" type="button" aria-label="Switch between light and dark theme" class="bn403-theme-toggle">
+    <span id="theme-toggle-icon" aria-hidden="true">&#127769;</span>
+  </button>
+  <main class="bn403-main">
+    <section class="bn403-panel-left bn-cap-stack">
+      <div class="bn403-panel-brand">
+        <div class="bn403-panel-brand-slot bn403-panel-brand-slot--lang">
+          <div class="bn-cap-lang">
+            <button
+              type="button"
+              class="bn-cap-lang-btn"
+              id="languageDropdownBtn"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="languageDropdownMenu"
+              aria-label="Language"
+            >
+              <img
+                class="bn-cap-lang-btn-flag"
+                id="languageDropdownBtnFlag"
+                alt=""
+                width="20"
+                height="14"
+                referrerpolicy="no-referrer"
+              />
+              <span class="bn-cap-lang-btn-label" id="languageDropdownBtnLabel"></span>
+              <span class="bn-cap-lang-btn-chevron" aria-hidden="true">&#9662;</span>
+            </button>
+            <ul
+              class="bn-cap-lang-menu"
+              id="languageDropdownMenu"
+              role="listbox"
+              aria-label="Language"
+              hidden
+            ></ul>
+            <select
+              id="languageDropdown"
+              class="bn-cap-lang-select-sr-only"
+              tabindex="-1"
+              aria-hidden="true"
+            ></select>
+          </div>
         </div>
-        <div>
-            <p>USA: +1 234 567 88</p>
-            <p>EU: +44 55 6666 777</p>
+        <div class="bn403-logo-wrap">
+          <svg class="bn403-logo" width="120" height="48" viewBox="0 0 951 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_295_549)">
+          <path class="bn403-logo-mascot-bg" d="M232.615 236.878H37.7826C19.589 236.878 4.81104 221.996 4.81104 203.674V51.2037C4.81104 32.882 19.589 18 37.7826 18H232.615C250.808 18 265.585 32.882 265.585 51.2037V203.604C265.585 221.996 250.808 236.878 232.615 236.878Z" fill="white"/>
+          <path d="M232.609 236.878H37.7772C19.5836 236.878 4.80566 221.996 4.80566 203.674V51.2037C4.80566 32.882 19.5836 18 37.7772 18H232.609C250.803 18 265.58 32.882 265.58 51.2037V203.604C265.58 221.996 250.803 236.878 232.609 236.878Z" fill="#141324" fill-opacity="0.6"/>
+          <path d="M271.093 152.57C273.951 155.448 275.275 159.379 275.136 163.38C275.066 165.275 277.157 166.469 278.761 165.416C279.737 164.784 280.643 164.012 281.549 163.1C287.893 156.711 288.381 146.813 282.595 140.987C276.81 135.16 266.98 135.652 260.637 142.04C259.801 142.882 259.034 143.865 258.337 144.848C257.291 146.462 258.406 148.638 260.358 148.498C264.331 148.358 268.165 149.692 271.093 152.57Z" fill="#E84545"/>
+          <path d="M271.093 152.57C273.951 155.448 275.275 159.379 275.136 163.38C275.066 165.275 277.157 166.469 278.761 165.416C279.737 164.784 280.643 164.012 281.549 163.1C287.893 156.711 288.381 146.813 282.595 140.987C276.81 135.16 266.98 135.652 260.637 142.04C259.801 142.882 259.034 143.865 258.337 144.848C257.291 146.462 258.406 148.638 260.358 148.498C264.331 148.358 268.165 149.692 271.093 152.57Z" fill="#141324" fill-opacity="0.2"/>
+          <path d="M271.093 152.57C273.951 155.448 275.275 159.379 275.136 163.38C275.066 165.275 277.157 166.469 278.761 165.416C279.737 164.784 280.643 164.012 281.549 163.1C287.893 156.711 288.381 146.813 282.595 140.987C276.81 135.16 266.98 135.652 260.637 142.04C259.801 142.882 259.034 143.865 258.337 144.848C257.291 146.462 258.406 148.638 260.358 148.498C264.331 148.358 268.165 149.692 271.093 152.57Z" fill="#E84545"/>
+          <path d="M271.093 152.57C273.951 155.448 275.275 159.379 275.136 163.38C275.066 165.275 277.157 166.469 278.761 165.416C279.737 164.784 280.643 164.012 281.549 163.1C287.893 156.711 288.381 146.813 282.595 140.987C276.81 135.16 266.98 135.652 260.637 142.04C259.801 142.882 259.034 143.865 258.337 144.848C257.291 146.462 258.406 148.638 260.358 148.498C264.331 148.358 268.165 149.692 271.093 152.57Z" fill="#141324" fill-opacity="0.2"/>
+          <path d="M271.024 147.867C277.029 147.867 281.899 142.963 281.899 136.916C281.899 130.867 277.029 125.965 271.024 125.965C265.018 125.965 260.15 130.867 260.15 136.916C260.15 142.963 265.018 147.867 271.024 147.867Z" fill="#E84545"/>
+          <path d="M271.024 147.867C277.029 147.867 281.899 142.963 281.899 136.916C281.899 130.867 277.029 125.965 271.024 125.965C265.018 125.965 260.15 130.867 260.15 136.916C260.15 142.963 265.018 147.867 271.024 147.867Z" fill="#141324" fill-opacity="0.2"/>
+          <path d="M299.045 136.916C299.045 127.86 292.423 120.56 284.266 120.56C276.111 120.56 269.489 127.86 269.489 136.916C269.489 138.179 269.629 139.373 269.838 140.497C270.256 142.391 272.557 143.093 273.81 141.69C276.46 138.741 280.154 136.916 284.266 136.916C288.309 136.916 292.005 138.741 294.723 141.69C295.977 143.093 298.347 142.391 298.696 140.497" fill="#E84545"/>
+          <path d="M299.045 136.916C299.045 127.86 292.423 120.56 284.266 120.56C276.111 120.56 269.489 127.86 269.489 136.916C269.489 138.179 269.629 139.373 269.838 140.497C270.256 142.391 272.557 143.093 273.81 141.69C276.46 138.741 280.154 136.916 284.266 136.916C288.309 136.916 292.005 138.741 294.723 141.69C295.977 143.093 298.347 142.391 298.696 140.497" fill="#141324" fill-opacity="0.2"/>
+          <path d="M299.045 136.916C299.045 127.86 292.423 120.56 284.266 120.56C276.111 120.56 269.489 127.86 269.489 136.916C269.489 138.179 269.629 139.373 269.838 140.497C270.256 142.391 272.557 143.093 273.81 141.69C276.46 138.741 280.154 136.916 284.266 136.916C288.309 136.916 292.005 138.741 294.723 141.69C295.977 143.093 298.347 142.391 298.696 140.497" fill="#E84545"/>
+          <path d="M299.045 136.916C299.045 127.86 292.423 120.56 284.266 120.56C276.111 120.56 269.489 127.86 269.489 136.916C269.489 138.179 269.629 139.373 269.838 140.497C270.256 142.391 272.557 143.093 273.81 141.69C276.46 138.741 280.154 136.916 284.266 136.916C288.309 136.916 292.005 138.741 294.723 141.69C295.977 143.093 298.347 142.391 298.696 140.497" fill="#141324" fill-opacity="0.2"/>
+          <path d="M299.045 136.916C299.045 127.86 292.423 120.56 284.266 120.56C276.111 120.56 269.489 127.86 269.489 136.916C269.489 138.179 269.629 139.373 269.838 140.497C270.256 142.391 272.557 143.093 273.81 141.69C276.46 138.741 280.154 136.916 284.266 136.916C288.309 136.916 292.005 138.741 294.723 141.69C295.977 143.093 298.347 142.391 298.696 140.497" fill="#E84545"/>
+          <path d="M299.045 136.916C299.045 127.86 292.423 120.56 284.266 120.56C276.111 120.56 269.489 127.86 269.489 136.916C269.489 138.179 269.629 139.373 269.838 140.497C270.256 142.391 272.557 143.093 273.81 141.69C276.46 138.741 280.154 136.916 284.266 136.916C288.309 136.916 292.005 138.741 294.723 141.69C295.977 143.093 298.347 142.391 298.696 140.497" fill="#141324" fill-opacity="0.2"/>
+          <path d="M269.488 103.643H0V182.405H269.488V103.643Z" fill="#E84545"/>
+          <path d="M104.769 161.977H78.6988C73.8889 161.977 69.9854 158.607 69.9854 154.465V134.529C69.9854 129.475 75.6316 125.895 81.2081 127.368L107.279 134.107C110.973 135.091 113.483 137.969 113.483 141.268V154.465C113.483 158.607 109.58 161.977 104.769 161.977Z" fill="white"/>
+          <path d="M269.49 103.923H178.662V182.686H269.49V103.923Z" fill="#E84545"/>
+          <path d="M269.49 103.923H178.662V182.686H269.49V103.923Z" fill="#141324" fill-opacity="0.2"/>
+          <path d="M191.698 161.977H165.628C160.817 161.977 156.914 158.607 156.914 154.465V141.268C156.914 137.969 159.423 135.02 163.118 134.108L189.188 127.369C194.764 125.895 200.411 129.545 200.411 134.529V154.465C200.411 158.607 196.508 161.977 191.698 161.977Z" fill="white"/>
+          <path opacity="0.3" d="M135.163 103.642H265.515V51.4846C265.515 33.0225 250.598 18 232.265 18H135.163V103.642Z" fill="#141324" fill-opacity="0.4"/>
+          <path opacity="0.3" d="M135.163 236.877H232.544C250.807 236.877 265.585 221.996 265.585 203.603V182.404H135.232L135.163 236.877Z" fill="#141324" fill-opacity="0.4"/>
+          </g>
+          <path d="M333 103.5V33H365.5C373.233 33 379.2 34.6333 383.4 37.9C387.6 41.1667 389.7 45.6333 389.7 51.3C389.7 55.5 388.433 59.0667 385.9 62C383.433 64.9333 380.033 66.9 375.7 67.9V66.3C380.767 67.1667 384.667 69.1 387.4 72.1C390.2 75.0333 391.6 78.8667 391.6 83.6C391.6 89.8667 389.367 94.7667 384.9 98.3C380.5 101.767 374.4 103.5 366.6 103.5H333ZM347.9 91.9H364.7C368.567 91.9 371.533 91.1667 373.6 89.7C375.667 88.2333 376.7 85.9 376.7 82.7C376.7 79.4333 375.667 77.1 373.6 75.7C371.533 74.2333 368.567 73.5 364.7 73.5H347.9V91.9ZM347.9 62H362.7C366.767 62 369.767 61.2667 371.7 59.8C373.633 58.3333 374.6 56.1333 374.6 53.2C374.6 50.3333 373.633 48.1667 371.7 46.7C369.767 45.2333 366.767 44.5 362.7 44.5H347.9V62Z" fill="#E84545"/>
+          <path d="M404.629 103.5V33H420.229V103.5H404.629Z" fill="#E84545"/>
+          <path d="M452.812 103.5V45.7H430.412V33H490.812V45.7H468.412V103.5H452.812Z" fill="#E84545"/>
+          <path d="M501.305 103.5V33H512.905L551.205 81.7H548.505V33H563.005V103.5H551.405L513.205 54.8H515.805V103.5H501.305Z" fill="#E84545"/>
+          <path d="M579.281 103.5V33H594.881V103.5H579.281Z" fill="#E84545"/>
+          <path d="M611.164 103.5V33H622.764L661.064 81.7H658.364V33H672.864V103.5H661.264L623.064 54.8H625.664V103.5H611.164Z" fill="#E84545"/>
+          <path d="M691.541 122.2C690.341 122.2 688.907 122.133 687.241 122C685.574 121.867 683.874 121.633 682.141 121.3V109.1C683.474 109.367 684.741 109.567 685.941 109.7C687.141 109.833 688.107 109.9 688.841 109.9C691.907 109.9 694.074 109.033 695.341 107.3C696.607 105.567 697.241 102.767 697.241 98.9V33H712.841V98.9C712.841 104.1 712.107 108.433 710.641 111.9C709.241 115.367 706.974 117.933 703.841 119.6C700.774 121.333 696.674 122.2 691.541 122.2Z" fill="#E84545"/>
+          <path d="M720.927 103.5L753.327 33H766.227L799.027 103.5H783.227L774.727 83.9L780.827 88.2H738.927L745.127 83.9L736.627 103.5H720.927ZM759.727 49.4L746.827 80L744.127 76.2H775.627L773.327 80L760.127 49.4H759.727Z" fill="#E84545"/>
+          <path d="M356.016 222.756C351.256 222.756 346.944 222.168 343.08 220.992C339.216 219.76 335.856 218.024 333 215.784L335.94 208.896C337.844 210.352 339.804 211.556 341.82 212.508C343.892 213.46 346.076 214.188 348.372 214.692C350.724 215.14 353.272 215.364 356.016 215.364C360.72 215.364 364.164 214.524 366.348 212.844C368.588 211.164 369.708 208.952 369.708 206.208C369.708 203.856 368.924 202.036 367.356 200.748C365.844 199.46 363.156 198.424 359.292 197.64L350.136 195.792C344.704 194.672 340.644 192.852 337.956 190.332C335.324 187.756 334.008 184.256 334.008 179.832C334.008 176.248 334.96 173.112 336.864 170.424C338.768 167.736 341.4 165.664 344.76 164.208C348.176 162.752 352.152 162.024 356.688 162.024C360.888 162.024 364.752 162.64 368.28 163.872C371.808 165.048 374.776 166.812 377.184 169.164L374.328 175.8C371.808 173.616 369.12 172.02 366.264 171.012C363.408 169.948 360.16 169.416 356.52 169.416C352.208 169.416 348.82 170.312 346.356 172.104C343.948 173.896 342.744 176.332 342.744 179.412C342.744 181.876 343.5 183.808 345.012 185.208C346.58 186.608 349.156 187.672 352.74 188.4L361.896 190.164C367.552 191.34 371.724 193.16 374.412 195.624C377.1 198.032 378.444 201.364 378.444 205.62C378.444 209.036 377.52 212.032 375.672 214.608C373.88 217.184 371.304 219.2 367.944 220.656C364.584 222.056 360.608 222.756 356.016 222.756Z" fill="white"/>
+          <path d="M392.54 222V162.78H431.348V169.752H401.024V188.4H429.416V195.456H401.024V214.944H431.348V222H392.54Z" fill="white"/>
+          <path d="M471.993 222.756C465.945 222.756 460.793 221.524 456.537 219.06C452.281 216.596 449.005 213.096 446.709 208.56C444.469 203.968 443.349 198.564 443.349 192.348C443.349 186.132 444.469 180.756 446.709 176.22C449.005 171.684 452.281 168.184 456.537 165.72C460.793 163.256 465.945 162.024 471.993 162.024C476.193 162.024 479.945 162.64 483.249 163.872C486.553 165.104 489.437 166.896 491.901 169.248L488.877 176.22C486.189 173.924 483.557 172.272 480.981 171.264C478.461 170.256 475.521 169.752 472.161 169.752C465.777 169.752 460.905 171.712 457.545 175.632C454.185 179.552 452.505 185.124 452.505 192.348C452.505 199.572 454.185 205.172 457.545 209.148C460.905 213.068 465.777 215.028 472.161 215.028C475.521 215.028 478.461 214.524 480.981 213.516C483.557 212.508 486.189 210.828 488.877 208.476L491.901 215.448C489.437 217.8 486.553 219.62 483.249 220.908C479.945 222.14 476.193 222.756 471.993 222.756Z" fill="white"/>
+          <path d="M530.253 222.756C522.021 222.756 515.889 220.684 511.857 216.54C507.881 212.396 505.893 206.264 505.893 198.144V162.78H514.629V197.976C514.629 203.688 515.861 208 518.325 210.912C520.845 213.768 524.821 215.196 530.253 215.196C535.405 215.196 539.297 213.768 541.929 210.912C544.561 208 545.877 203.688 545.877 197.976V162.78H554.445V198.144C554.445 206.264 552.401 212.396 548.313 216.54C544.225 220.684 538.205 222.756 530.253 222.756Z" fill="white"/>
+          <path d="M571.359 222V162.78H596.391C602.719 162.78 607.618 164.292 611.091 167.316C614.562 170.284 616.299 174.456 616.299 179.832C616.299 183.36 615.515 186.384 613.947 188.904C612.379 191.424 610.167 193.356 607.311 194.7C604.455 195.988 601.095 196.632 597.231 196.632L598.575 195.288H600.843C603.139 195.288 605.183 195.876 606.975 197.052C608.823 198.228 610.335 200.104 611.511 202.68L619.995 222H610.419L602.019 202.596C601.179 200.3 599.863 198.816 598.071 198.144C596.335 197.472 594.178 197.136 591.603 197.136H580.095V222H571.359ZM580.095 190.5H594.963C599.163 190.5 602.327 189.604 604.455 187.812C606.639 186.02 607.731 183.444 607.731 180.084C607.731 176.668 606.639 174.092 604.455 172.356C602.327 170.62 599.163 169.752 594.963 169.752H580.095V190.5Z" fill="white"/>
+          <path d="M633.289 222V162.78H642.025V222H633.289Z" fill="white"/>
+          <path d="M673.485 222V170.088H653.241V162.78H702.465V170.088H682.221V222H673.485Z" fill="white"/>
+          <path d="M729.435 222V194.196L731.367 199.74L706.419 162.78H716.499L735.063 191.088H732.963L751.527 162.78H761.271L736.407 199.74L738.171 194.196V222H729.435Z" fill="white"/>
+          <defs>
+          <clipPath id="clip0_295_549">
+          <rect width="298" height="219" fill="white" transform="translate(0 18)"/>
+          </clipPath>
+          </defs>
+          </svg>
         </div>
-        -->
       </div>
 
-      <noscript>
-        <div class="alert card">
-          <div class="title">Your browser does not support JavaScript!</div>
-          <p>Please enable Javascript and refresh this page!</p>
+      <div class="bn403-copy">
+        <h1 class="bn403-title js-lang-TITLE"></h1>
+        <p class="bn403-lead js-lang-SUBTITLE"></p>
+      </div>
+
+      <div class="bn403-ip-card" aria-label="IP">
+        <div class="bn403-ip-stack">
+          <span class="bn403-ip-label js-lang-YOUR_IP"></span>
+          <span class="bn403-ip-value">52.225.25.49</span>
         </div>
-      </noscript>
+      </div>
 
-      <div class="card">
-        <div class="captcha-container">
-
-          <div class="container-header">
-            <div class="bn-logo">
-            <img class="img-responsive logo" alt="BitNinja" src="data:image/png;base64,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">            
-            </div>
-            <div class="right">
-              <select id="languageDropdown" class="link"></select>
-            </div>
-          </div>
-          
-          <div class="title js-lang-TITLE"></div>
-
-          <div class="description js-lang-SUBTITLE"></div>
-
-          <div class="ip-info info">
-            <span class="js-lang-YOUR_IP"></span>:
-            <b class="primary"> 68.220.62.145</b>
-            <!-- ∘ BNI: 552aebbdf8d1b9f8 -->
-          </div>
-
-          <div class="center">
-            <div class="captcha">
-              <form method="post" >
-                <div class="flex-center">
-                  <script src="https://recaptcha.net/recaptcha/api.js" async defer></script>
+      <section class="bn403-steps-sheet">
+        <div class="bn403-continue-sheet">
+          <form class="bn-cap-captcha-form" method="post" >
+            <div class="bn-cap-captcha-wrap">
+              <script src="https://recaptcha.net/recaptcha/api.js" async defer></script>
                     <div class="g-recaptcha" data-sitekey="6LdvpRAUAAAAAJkr4psZnXC4TeOEVPwP_bEQrP24"></div>
-                </div>
-
-                <input type="hidden" name="origin_url" value="/Api/Market/Gold_Currency.php" />
-
-                <div class="form-actions">
-                  <input type="submit" class="delist-button js-lang-SUBMIT" value="Delist" />
-
-                  <!-- <div id="moreInfoDropdown" class="link">
-                    <span class="js-lang-HEADING"></span> ⌵
-                  </div> -->
-                </div>
-              </form>
             </div>
-            <div id="moreInfo">
+            <input type="hidden" name="origin_url" value="/Api/Market/Gold_Currency.php" />
+            <input type="submit" class="bn403-continue-btn js-lang-SUBMIT" value="Delist" />
+          </form>
+        </div>
+      </section>
+
+      <footer class="bn403-panel-foot">
+        <p class="bn-cap-foot-check js-lang-CHECK"></p>
+        <div class="bn403-waf">
+          <span>CAPTCHA</span>
+        </div>
+      </footer>
+
+      <h2 class="bn403-info-title js-lang-HEADING"></h2>
+      <div class="bn403-info-sheet">
+        <div class="bn403-info-list">
+          <div class="bn403-info-block bn-cap-info-single">
+            <div class="bn-cap-info-body">
               <span class="js-lang-PRE_BODY"></span>
               <span class="js-lang-POST_BODY"></span>
             </div>
           </div>
         </div>
       </div>
+    </section>
+  </main>
+
+  <noscript>
+    <div class="noscript-banner">
+      <div class="bn403-info-sheet">
+        <div class="bn403-info-list">
+          <div class="bn403-info-block bn-cap-info-single">
+            <p style="margin:0;padding:1rem 1.25rem;">Please enable JavaScript and reload this page to complete the verification.</p>
+          </div>
+        </div>
+      </div>
     </div>
+  </noscript>
 
-    <footer class="info js-lang-CHECK"></footer>
-
-    <script>
-      // Use and calculate colors:
-
-      const primaryColor = "#c00000";
-      const backgroundColor = "#fff";
+<script>
 
       var fallbackLanguage = { code: "en" };
 
-      // Detect browser language
+      var rawServerLang = "ir";
+      var serverPreferredLangCode =
+        typeof rawServerLang === "string"
+          ? rawServerLang.replace(/^\s+|\s+$/g, "")
+          : "";
 
-      var browserLanguages = [
-        ...parse(window.navigator.language),
-        fallbackLanguage,
-      ];
+      var browserLanguages;
+      if (
+        serverPreferredLangCode !== "" &&
+        typeof translations[serverPreferredLangCode] !== "undefined"
+      ) {
+        browserLanguages = [
+          { code: serverPreferredLangCode },
+          ...parse(window.navigator.language),
+          fallbackLanguage,
+        ];
+      } else {
+        browserLanguages = [
+          ...parse(window.navigator.language),
+          fallbackLanguage,
+        ];
+      }
 
       var languageDropdown = document.getElementById("languageDropdown");
+      var languageDropdownBtn = document.getElementById("languageDropdownBtn");
+      var languageDropdownMenu = document.getElementById("languageDropdownMenu");
+      var languageDropdownBtnFlag = document.getElementById("languageDropdownBtnFlag");
+      var languageDropdownBtnLabel = document.getElementById("languageDropdownBtnLabel");
+
+      function languageFlagUrl(langCode) {
+        var iso = languageFlagIso[langCode];
+        return iso ? languageFlagCdnBase + iso + ".png" : "";
+      }
+
+      function setLanguagePickerUi(langCode) {
+        var label = languages[langCode] || langCode;
+        var url = languageFlagUrl(langCode);
+        languageDropdownBtnLabel.textContent = label;
+        if (url) {
+          languageDropdownBtnFlag.src = url;
+          languageDropdownBtnFlag.alt = "";
+          languageDropdownBtnFlag.referrerPolicy = "no-referrer";
+        } else {
+          languageDropdownBtnFlag.removeAttribute("src");
+        }
+        languageDropdownBtnFlag.style.display = url ? "" : "none";
+        Array.prototype.forEach.call(languageDropdownMenu.querySelectorAll("li"), function (
+          row
+        ) {
+          row.classList.toggle(
+            "bn-cap-lang-item-active",
+            row.getAttribute("data-lang") === langCode
+          );
+        });
+      }
+
+      function closeLanguageMenu() {
+        languageDropdownMenu.hidden = true;
+        languageDropdownBtn.setAttribute("aria-expanded", "false");
+      }
+
+      function openLanguageMenu() {
+        languageDropdownMenu.hidden = false;
+        languageDropdownBtn.setAttribute("aria-expanded", "true");
+      }
 
       languageDropdown.addEventListener(
         "change",
         function () {
-          translate([{ code: languageDropdown.value }, fallbackLanguage]);
+          var code = languageDropdown.value;
+          setLanguagePickerUi(code);
+          translate([{ code: code }, fallbackLanguage]);
         },
         false
       );
 
+      languageDropdownBtn.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        if (languageDropdownMenu.hidden) {
+          openLanguageMenu();
+        } else {
+          closeLanguageMenu();
+        }
+      });
+
+      document.addEventListener("click", function () {
+        closeLanguageMenu();
+      });
+
+      languageDropdownMenu.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+      });
+
+      document.addEventListener("keydown", function (ev) {
+        if (ev.key === "Escape") {
+          closeLanguageMenu();
+        }
+      });
+
       for (const langCode in translations) {
+        var langLabel = languages[langCode] || langCode;
         var opt = document.createElement("option");
         opt.value = langCode;
-        opt.innerHTML = languages[langCode];
+        opt.textContent = langLabel;
         opt.selected = browserLanguages[0].code === langCode;
-
         languageDropdown.appendChild(opt);
+
+        var li = document.createElement("li");
+        li.setAttribute("role", "option");
+        li.setAttribute("data-lang", langCode);
+        var flagUrl = languageFlagUrl(langCode);
+        if (flagUrl) {
+          var img = document.createElement("img");
+          img.className = "bn-cap-lang-item-flag";
+          img.src = flagUrl;
+          img.alt = "";
+          img.width = 20;
+          img.height = 14;
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.referrerPolicy = "no-referrer";
+          li.appendChild(img);
+        }
+        var span = document.createElement("span");
+        span.className = "bn-cap-lang-item-label";
+        span.textContent = langLabel;
+        li.appendChild(span);
+        li.addEventListener("click", function () {
+          var code = langCode;
+          languageDropdown.value = code;
+          languageDropdown.dispatchEvent(new Event("change", { bubbles: true }));
+          closeLanguageMenu();
+        });
+        languageDropdownMenu.appendChild(li);
       }
+
+      setLanguagePickerUi(languageDropdown.value);
 
       // More info dropdown
 
       var moreInfoDropdown = document.getElementById("moreInfoDropdown");
-
-      moreInfoDropdown.addEventListener(
-        "click",
-        function () {
-          if(document.getElementById("moreInfo").className === 'visible') {
-            document.getElementById("moreInfo").className = "invisible";
-          } else {
-            document.getElementById("moreInfo").className = "visible";
-          }
-        },
-        false
-      );
+      if (moreInfoDropdown) {
+        moreInfoDropdown.addEventListener(
+          "click",
+          function () {
+            var el = document.getElementById("moreInfo");
+            if (!el) return;
+            if (el.className === "visible") {
+              el.className = "invisible";
+            } else {
+              el.className = "visible";
+            }
+          },
+          false
+        );
+      }
     </script>
 
     <script>
@@ -958,33 +2125,6 @@
       }
 
       translate(browserLanguages);
-    </script>
-    <script>
-      try {
-        document.body.style.backgroundColor = backgroundColor;
-        document.body.style.color = adaptiveColor(backgroundColor);
-
-        document.querySelectorAll("button").forEach(function (el) {
-          el.style.backgroundColor = primaryColor;
-          el.style.color = adaptiveColor(primaryColor);
-        });
-
-        document.querySelectorAll(".card").forEach(function (el) {
-          el.style.backgroundColor = backgroundColor;
-        });
-
-        document.querySelectorAll(".primary").forEach(function (el) {
-          el.style.color = primaryColor;
-        });
-
-        document.querySelectorAll(".link").forEach(function (el) {
-          el.style.color = primaryColor;
-        });
-
-        document.querySelectorAll(".info").forEach(function (el) {
-          el.style.color = adaptiveColor(backgroundColor, "#333", "#979797");
-        });
-      } catch (e) {}
     </script>
   </body>
 
