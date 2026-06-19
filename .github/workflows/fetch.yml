@@ -7,23 +7,32 @@ on:
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch: {}
-  push:
-    paths:
-      - ".github/workflows/fetch.yml"
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug
+        run: |
+          echo "Workflow started at: $(date)"
+          echo "Repo: $GITHUB_REPOSITORY"
+          echo "Ref: $GITHUB_REF"
+          echo "SHA: $GITHUB_SHA"
+
       - name: Fetch JSON via curl
         run: |
-          set -e
-          curl -fsSL "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G" -o data.json
+          set -euo pipefail
+          URL="https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G"
+          echo "Fetching: $URL"
+          curl -fsSL --connect-timeout 30 --max-time 90 --retry 3 --retry-delay 10 "$URL" -o data.json
+          test -s data.json
           jq empty data.json
-          test -s data.json || { echo "Empty data.json"; exit 1; }
+          echo "Downloaded file preview:"
+          head -c 200 data.json; echo
 
       - name: Configure git
         run: |
@@ -32,6 +41,7 @@ jobs:
 
       - name: Commit if changed
         run: |
+          git status --short
           if ! git diff --quiet -- data.json; then
             git add data.json
             git commit -m "chore: update data.json from API"
