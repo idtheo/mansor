@@ -1,51 +1,31 @@
-name: Fetch API to JSON
+name: Debug BRS API
 
 permissions:
   contents: write
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"
   workflow_dispatch: {}
 
 jobs:
-  refresh:
+  debug:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Debug
+      - name: Network debug
         run: |
-          echo "Workflow started at: $(date)"
-          echo "Repo: $GITHUB_REPOSITORY"
-          echo "Ref: $GITHUB_REF"
-          echo "SHA: $GITHUB_SHA"
+          set -x
 
-      - name: Fetch JSON via curl
-        run: |
-          set -euo pipefail
-          URL="https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G"
-          echo "Fetching: $URL"
-          curl -fsSL --connect-timeout 30 --max-time 90 --retry 3 --retry-delay 10 "$URL" -o data.json
-          test -s data.json
-          jq empty data.json
-          echo "Downloaded file preview:"
-          head -c 200 data.json; echo
+          echo "DNS for brsapi.ir"
+          nslookup brsapi.ir || true
 
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          echo "DNS for api.brsapi.ir"
+          nslookup api.brsapi.ir || true
 
-      - name: Commit if changed
-        run: |
-          git status --short
-          if ! git diff --quiet -- data.json; then
-            git add data.json
-            git commit -m "chore: update data.json from API"
-            git push
-          else
-            echo "No changes"
-          fi
+          echo "Headers without following redirect"
+          curl -Iv --connect-timeout 20 "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G" || true
+
+          echo "Headers with redirect"
+          curl -ILv --connect-timeout 20 --max-time 60 "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G" || true
+
+          echo "Direct api.brsapi.ir test"
+          curl -Iv --connect-timeout 20 "https://api.brsapi.ir" || true
