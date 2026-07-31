@@ -22,7 +22,8 @@ jobs:
         run: |
           set -e
           HTTP_CODE=$(curl -sS -o data.json -w "%{http_code}" \
-            "https://api.brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G")
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" \
+            "https://api.brsapi.ir/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G")
 
           echo "HTTP status: $HTTP_CODE"
           echo "data.json size: $(stat -c%s data.json) bytes"
@@ -33,7 +34,6 @@ jobs:
             exit 1
           fi
 
-          # اطمینان از این‌که پاسخ واقعاً JSON معتبره، نه صفحه‌ی خطا/HTML
           if ! python3 -c "import json,sys; json.load(open('data.json'))" 2>/dev/null; then
             echo "ERROR: response is not valid JSON" >&2
             head -c 300 data.json || true
