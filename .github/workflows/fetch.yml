@@ -1,31 +1,51 @@
-name: Debug BRS API
+name: Fetch API to JSON
 
 permissions:
   contents: write
 
 on:
+  schedule:
+    - cron: "*/5 * * * *"
   workflow_dispatch: {}
+  push:
+    paths:
+      - ".github/workflows/fetch.yml"
 
 jobs:
-  debug:
+  refresh:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Network debug
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch API data
         run: |
-          set -x
+          set -e
+          HTTP_CODE=$(curl -sS -o data.json -w "%{http_code}" \
+            "https://api.brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G")
 
-          echo "DNS for brsapi.ir"
-          nslookup brsapi.ir || true
+          echo "HTTP status: $HTTP_CODE"
+          echo "data.json size: $(stat -c%s data.json) bytes"
 
-          echo "DNS for api.brsapi.ir"
-          nslookup api.brsapi.ir || true
+          if [ "$HTTP_CODE" != "200" ] || [ ! -s data.json ]; then
+            echo "ERROR: fetch failed (status=$HTTP_CODE, size=$(stat -c%s data.json 2>/dev/null || echo 0))" >&2
+            head -c 300 data.json || true
+            exit 1
+          fi
 
-          echo "Headers without following redirect"
-          curl -Iv --connect-timeout 20 "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G" || true
+          # اطمینان از این‌که پاسخ واقعاً JSON معتبره، نه صفحه‌ی خطا/HTML
+          if ! python3 -c "import json,sys; json.load(open('data.json'))" 2>/dev/null; then
+            echo "ERROR: response is not valid JSON" >&2
+            head -c 300 data.json || true
+            exit 1
+          fi
 
-          echo "Headers with redirect"
-          curl -ILv --connect-timeout 20 --max-time 60 "https://brsapi.ir/Api/Market/Gold_Currency.php?key=BSKDtB7FB31bcKKZgegXzfzLKQ2abZ5G" || true
+          echo "Preview:"
+          head -c 300 data.json
 
-          echo "Direct api.brsapi.ir test"
-          curl -Iv --connect-timeout 20 "https://api.brsapi.ir" || true
+      - name: Commit changes if updated
+        uses: test-room-7/action-update-file@v1
+        with:
+          file-path: data.json
+          commit-msg: "chore: update data.json from API"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
